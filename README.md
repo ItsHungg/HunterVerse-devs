@@ -29,4 +29,5 @@ Main Developer: **Hung**<br>
 Author: **Hung**<br>
 
 <hr>
-You can download and see versions' information through [this website](https://sites.google.com/view/project-hunterverse/home).
+
+You can download and see versions' information through [this website](https://sites.google.com/view/project-hunterverse).
