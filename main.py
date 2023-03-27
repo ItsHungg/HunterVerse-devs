@@ -2,55 +2,121 @@ from tkinter import messagebox
 from tkinter import ttk
 from tkinter import *
 import random
+import time
 
-project_name = 'Untitled Project'
-version = '0.9.1'
+project_name = 'HunterVerse'
+version = '0.9.2'
 version_code = sum(list(map(int, version.split('.'))))
-username = 'User001'
 root = Tk()
 root.resizable(False, False)
 root.title(f'{project_name} {version}')
-
 root.withdraw()
 
-mainProgressWindow = Toplevel(root)
-mainProgressWindow.title('Initializing')
-mainProgressValueLabel = Label(mainProgressWindow, text='Initializing... (0%)', font=('Calibri', 11, 'bold'))
-mainProgressValueLabel.grid(row=3, column=3, sticky='ew')
+with open('hunterverse\\assets\\user\\userdata.txt', 'r') as userget:
+    if userget.read().strip() != '':
+        register_need = False
+    else:
+        register_need = True
+
+
+def register():
+    registerPage = Toplevel(root)
+    registerPage.title('Sign Up')
+    registerPage.resizable(False, False)
+
+    def registerCallback(_):
+        maximunUsernameLengthLabel.configure(text=f'{len(usernameEntry.get())}/10')
+        if any(i in '`-=[]\\;\',./~!@#$%^&*()_+{}|:\"<>?' for i in usernameEntry.get()) or usernameEntry.get().isdigit() or not 3 <= len(
+                usernameEntry.get()) <= 10:
+            submitregisterButton.configure(state=DISABLED)
+            if len(usernameEntry.get()) == 0:
+                maximunUsernameLengthLabel.configure(foreground='black')
+            else:
+                maximunUsernameLengthLabel.configure(foreground='#a60a0a')
+        else:
+            submitregisterButton.configure(state=NORMAL)
+            maximunUsernameLengthLabel.configure(foreground='black')
+
+    def submitRegister():
+        submitregisterButton.configure(state=DISABLED)
+        usernameEntry.configure(state=DISABLED)
+        with open('hunterverse\\assets\\user\\userdata.txt', 'w') as saveRegister:
+            saveRegister.write(
+                f'{usernameEntry.get()}.{time.strftime("%m-%d-%Y")}.{time.strftime("%T")}.{int(time.time())}')
+
+        Label(registerPage, text='Processing...', font=('Calibri', 11, 'bold')).grid(row=10, column=3, columnspan=3, pady=5)
+        root.after(random.randint(2500, 5000), lambda: [registerPage.destroy(), loadingProcess()])
+
+    mainregisterFrame = Frame(registerPage)
+    mainregisterFrame.grid(row=3, column=3)
+
+    registerHeader = Label(mainregisterFrame, text='Sign Up', font=('Calibri', 15, 'bold'))
+    registerHeader.grid(row=3, column=3, columnspan=4)
+
+    Label(mainregisterFrame, text='Username: ').grid(row=5, column=4)
+    usernameEntry = Entry(mainregisterFrame)
+    usernameEntry.grid(row=5, column=5)
+
+    maximunUsernameLengthLabel = Label(mainregisterFrame, text='0/10')
+    maximunUsernameLengthLabel.grid(row=5, column=6)
+
+    submitregisterButton = Button(mainregisterFrame, text='Register', state=DISABLED, command=submitRegister)
+    submitregisterButton.grid(row=9, column=3, columnspan=4)
+
+    usernameEntry.bind('<KeyRelease>', registerCallback)
 
 
 def temp():
     pass
 
 
-def startInit():
-    global repeatMainProgress
-    if mainProgressbar['value'] < 100:
-        mainProgressbar['value'] += 1
-        mainProgressValueLabel.configure(text=f'Initializing... ({int(mainProgressbar["value"])}%)')
-        repeatMainProgress = root.after(random.randint(10, 500), startInit)
-    else:
-        mainProgressValueLabel.configure(text=f'Successfully run: {project_name} {version}')
-        root.after(random.randint(2500, 5000), lambda: [root.deiconify(), mainProgressWindow.destroy()])
+def loadingProcess():
+    global username
+
+    mainProgressWindow = Toplevel(root)
+    mainProgressWindow.title('Initialization')
+    mainProgressValueLabel = Label(mainProgressWindow, text='Initializing... (0%)', font=('Calibri', 11, 'bold'))
+    mainProgressValueLabel.grid(row=3, column=3, sticky='ew')
+    mainProgressWindow.resizable(False, False)
+
+    with open('hunterverse\\assets\\user\\userdata.txt', 'r') as setUsername:
+        username = setUsername.read().strip().split('.')[0]
+
+    def startInit():
+        global repeatMainProgress
+        if mainProgressbar['value'] < 100:
+            mainProgressbar['value'] += 1
+            mainProgressValueLabel.configure(text=f'Initializing... ({int(mainProgressbar["value"])}%)')
+            repeatMainProgress = root.after(random.randint(10, 500), startInit)
+        else:
+            mainProgressValueLabel.configure(text=f'Successfully run: {project_name} {version}')
+            root.after(random.randint(2500, 5000), lambda: [root.deiconify(), mainProgressWindow.destroy()])
+
+    mainProgressbar = ttk.Progressbar(mainProgressWindow, orient='horizontal', mode='determinate', length=300)
+    mainProgressbar.grid(row=4, column=3, sticky='ew')
+
+    mainProgressWindow.protocol("WM_DELETE_WINDOW", lambda: root.destroy())
+    root.after(random.randint(1000, 2500),
+               lambda: [startInit(), mainProgressWindow.protocol("WM_DELETE_WINDOW", askCancelProgress)])
+
+    def askCancelProgress():
+        global repeatMainProgress
+        if messagebox.askyesno(f'Cancel Initialization',
+                               'Are you sure to cancel initialization?\nThis might cause damage to the assets!'):
+            mainProgressWindow.protocol("WM_DELETE_WINDOW", temp)
+            root.after_cancel(repeatMainProgress)
+            mainProgressbar['value'] = 100
+            mainProgressValueLabel.configure(text='Terminating initialization...')
+            root.after(random.randint(1500, 3000), lambda: root.destroy())
+            del repeatMainProgress
+
+    mainProgressWindow.protocol("WM_DELETE_WINDOW", temp)
 
 
-mainProgressbar = ttk.Progressbar(mainProgressWindow, orient='horizontal', mode='determinate', length=300)
-mainProgressbar.grid(row=4, column=3, sticky='ew')
-
-mainProgressWindow.protocol("WM_DELETE_WINDOW", lambda: root.destroy())
-root.after(random.randint(1000, 2500), lambda: [startInit(), mainProgressWindow.protocol("WM_DELETE_WINDOW", askCancelProgress)])
-
-
-def askCancelProgress():
-    global repeatMainProgress
-    if messagebox.askyesno(f'Cancel Initialization', 'Are you sure to cancel initialization?\nThis might cause damage to the assets!'):
-        mainProgressWindow.protocol("WM_DELETE_WINDOW", temp)
-        root.after_cancel(repeatMainProgress)
-        mainProgressbar['value'] = 100
-        mainProgressValueLabel.configure(text='Terminating initialization...')
-        root.after(random.randint(1500, 3000), lambda: root.destroy())
-        del repeatMainProgress
-
+if register_need:
+    register()
+else:
+    loadingProcess()
 
 # DECLARATION
 
