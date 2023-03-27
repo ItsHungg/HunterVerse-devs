@@ -9,7 +9,7 @@ HunterVerse is a game where you can hunt down animals, sell, sacrifice, and batt
 pip install tk
 ```
 **Note: You won't need to install Python or anything when the official version is released.**
-* After doing all the set up steps, this is how you can open and run the game file (For version `0.9.1 BETA`).
+* After doing all the set up steps, this is how you can open and run the game file.
 > 1. After downloading a `.rar` or `.zip` file, unzip it.
 > 2. After you unzip the file into a folder, you should see a `main.py` file in that folder.
 > 4. You should see the game starts initializing and a terminal.
@@ -22,9 +22,9 @@ pip install tk
 
 ## Information
 Project Name: **HunterVerse**<br>
-Project Version: `0.9.1` (**BETA**)<br><br>
-Latest Update: `0.9.1`<br>
-Date Updated: **March 26<sup>th</sup> 2023<br>**
+Project Version: `0.9.2` (**BETA**)<br><br>
+Latest Update: `0.9.2`<br>
+Date Updated: **March 27<sup>th</sup> 2023<br>**
 Main Developer: **Hung**<br>
 Author: **Hung**<br>
 
