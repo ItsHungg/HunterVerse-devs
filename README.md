@@ -25,7 +25,7 @@ pip install tk
 
 ## Information
 Project Name: **HunterVerse**<br>
-Project Version: `0.9.2` (**BETA**)<br><br>
+Project Version: `0.9.2.1` (**BETA**)<br><br>
 
 <hr>
 
