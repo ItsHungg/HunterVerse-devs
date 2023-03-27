@@ -1,0 +1,14 @@
+Dog.58:56
+Cat.52:46
+Elephant.68:85
+Eagle.81:52
+Cow.36:42
+Turtle.16:92
+Rabbit.39:17
+Cheetah.82:71
+Crocodile.83:81
+Bear.85:78
+Wolf.76:52
+Rat.38:27
+Fox.61:50
+Buffalo.80:76

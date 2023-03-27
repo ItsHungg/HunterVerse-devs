@@ -1,0 +1,8 @@
+Basic Lootbox.Knife:Bow:Spear
+Silver Lootbox.Knife:Bow:Crossbow:Spear:Sword
+Copper Lootbox.Knife:Bow:Crossbow:Spear:Sword:Hammer
+Iron Lootbox.Knife:Bow:Crossbow:Spear:Sword:Hammer:Strength Poison 1
+Golden Lootbox.Bow:Crossbow:Spear:Sword:Hammer:Axe:Boots
+Diamond Lootbox.Bow:Spear:Sword:Hammer:Axe:Boots:Leggings:Strength Poison 2
+Emerald Lootbox.Sword:Hammer:Axe:Boots:Leggings:Armor:Helmet:Strength Poison 3
+Special Lootbox.Axe:Boots:Leggings:Armor:Helmet:Strength Poison 1:Strength Poison 2:Strength Poison 3
