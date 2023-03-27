@@ -5,7 +5,7 @@ import random
 import time
 
 project_name = 'HunterVerse'
-version = '0.9.2'
+version = '0.9.2.1'
 version_code = sum(list(map(int, version.split('.'))))
 root = Tk()
 root.resizable(False, False)
@@ -21,7 +21,7 @@ with open('hunterverse\\assets\\user\\userdata.txt', 'r') as userget:
 
 def register():
     registerPage = Toplevel(root)
-    registerPage.title('Sign Up')
+    registerPage.title('Registration')
     registerPage.resizable(False, False)
 
     def registerCallback(_):
@@ -47,10 +47,14 @@ def register():
         Label(registerPage, text='Processing...', font=('Calibri', 11, 'bold')).grid(row=10, column=3, columnspan=3, pady=5)
         root.after(random.randint(2500, 5000), lambda: [registerPage.destroy(), loadingProcess()])
 
+    def quitRegister():
+        if messagebox.askyesno('Quit Registration', 'Are you sure to cancel the registration progress?'):
+            root.destroy()
+    
     mainregisterFrame = Frame(registerPage)
     mainregisterFrame.grid(row=3, column=3)
 
-    registerHeader = Label(mainregisterFrame, text='Sign Up', font=('Calibri', 15, 'bold'))
+    registerHeader = Label(mainregisterFrame, text='Register', font=('Calibri', 15, 'bold'))
     registerHeader.grid(row=3, column=3, columnspan=4)
 
     Label(mainregisterFrame, text='Username: ').grid(row=5, column=4)
@@ -63,6 +67,7 @@ def register():
     submitregisterButton = Button(mainregisterFrame, text='Register', state=DISABLED, command=submitRegister)
     submitregisterButton.grid(row=9, column=3, columnspan=4)
 
+    registerPage.protocol("WM_DELETE_WINDOW", quitRegister)
     usernameEntry.bind('<KeyRelease>', registerCallback)
 
 
