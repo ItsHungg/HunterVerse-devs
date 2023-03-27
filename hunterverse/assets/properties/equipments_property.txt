@@ -1,0 +1,11 @@
+Sword.10
+Hammer.5
+Axe.15
+Knife.3
+Spear.7
+Crossbow.7
+Bow.5
+Helmet.25
+Armor.30
+Leggings.20
+Boots.10
