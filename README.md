@@ -12,8 +12,11 @@ pip install tk
 * After doing all the set up steps, this is how you can open and run the game file.
 > 1. After downloading a `.rar` or `.zip` file, unzip it.
 > 2. After you unzip the file into a folder, you should see a `main.py` file in that folder.
-> 4. You should see the game starts initializing and a terminal.
-> 5. Wait for the initialization to finish and enjoy the game!
+> 3. Open that `main.py` file. You will see a register window and a terminal.
+> 4. Ignore the terminal, just enter your username into the entry field and press the `Register` button.
+> 5. Wait for the application to process. It usually takes from 3 to 5 seconds.
+> 5. Then, you should see the game starts initializing.
+> 6. Wait for the initialization to finish and enjoy the game!
 
 ### FAQ (Frequently-Asked-Questions)
 (*There is no FAQs available yet*)
@@ -23,10 +26,6 @@ pip install tk
 ## Information
 Project Name: **HunterVerse**<br>
 Project Version: `0.9.2` (**BETA**)<br><br>
-Latest Update: `0.9.2`<br>
-Date Updated: **March 27<sup>th</sup> 2023<br>**
-Main Developer: **Hung**<br>
-Author: **Hung**<br>
 
 <hr>
 
