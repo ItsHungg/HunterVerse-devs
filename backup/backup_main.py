@@ -167,7 +167,6 @@ def keyforLootboxFilter(x: str):
 
 # # Values DECLARATION
 money = 1000
-smoney = f'${money}'
 
 # # Pets DECLARATION
 petsPropertiesString = '''
@@ -467,16 +466,21 @@ def coinflip():
             flipWindow.title('...')
             flipWindow.resizable(False, False)
 
+            faceChosen = faceChoiceCombobox.get()
+            faceChoice.destroy()
+
             def flipResult():
                 global money
                 result = random.choice(['Head', 'Tail'])
-                flipLabel.configure(text=f'The coin spins \"{result}\" and you won ${betValue*2}')
-                money += betValue * 2 if result == faceChoiceCombobox.get() else 0
+                flipLabel.configure(text=f'The coin spins... \"{result}\" and you {"won" if result == faceChosen else "lost"}')
+                Label(flipWindow, text=f'${betValue*2 if result == faceChosen else betValue}', font=('Calibri', 16, 'bold'), foreground='#9c4051').grid(row=6, column=3)
+                if result == faceChosen:
+                    money += betValue * 2
 
             betValue = int(moneyValue.replace('$', ''))
             money -= betValue
 
-            flipLabel = Label(flipWindow, text=f'{username} has spent {betValue} and chose {faceChoiceCombobox.get()}...')
+            flipLabel = Label(flipWindow, text=f'{username} has spent {betValue} and chose {faceChosen}...')
             flipLabel.grid(row=3, column=3)
             root.after(1500, flipResult)
 
@@ -493,7 +497,7 @@ def coinflip():
 
     Label(mainCoinflipFrame, text=f'Coinflip (GAMBLING)', font=('Calibri', 18, 'bold')).grid(row=3, column=3, pady=5)
 
-    moneyShowLabel = Label(mainCoinflipFrame, text=f'Cash: {smoney}')
+    moneyShowLabel = Label(mainCoinflipFrame, text=f'Cash: ${money}')
     moneyShowLabel.grid(row=5, column=3)
 
     betMoneyInput = Entry(mainCoinflipFrame, justify=CENTER)
