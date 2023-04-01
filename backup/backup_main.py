@@ -155,8 +155,8 @@ def keyforPetsFilter(x: str):
 
 
 def keyforWeaponsFilter(x: str):
-    return int("".join([k[1] for k in equipmentsProperties if x in k])), int(
-        "".join([k[1] for k in equipmentsProperties if x in k]))
+    return int("".join([k[1] for k in equipmentProperties if x in k])), int(
+        "".join([k[1] for k in equipmentProperties if x in k]))
 
 
 def keyforLootboxFilter(x: str):
@@ -191,8 +191,8 @@ petListAlt = []
 petList = sorted(list(set(petListAlt.copy())), key=keyforPetsFilter, reverse=True)
 # petList = sorted([x[0] for x in petsProperties], key=keyforPetsFilter, reverse=True)
 
-# # Equipments DECLARATION
-equipmentsPropertiesString = '''
+# # Equipment DECLARATION
+equipmentPropertiesString = '''
 Sword.10
 Hammer.10
 Axe.15
@@ -209,7 +209,7 @@ Strength Poison 2.15
 Strength Poison 3.25
 '''
 
-equipmentsProperties = [[i.split('.')[0], i.split('.')[1]] for i in equipmentsPropertiesString.split('\n') if i != '']
+equipmentProperties = [[i.split('.')[0], i.split('.')[1]] for i in equipmentPropertiesString.split('\n') if i != '']
 equipmentListAlt = []
 equipmentList = sorted(list(set(equipmentListAlt.copy())), key=keyforWeaponsFilter, reverse=True)
 
@@ -293,18 +293,18 @@ def equipment():
         equipmentNameLabel.configure(
             text=f'{selected_item} {f"(x{equipmentListAlt.count(selected_item)})" if equipmentListAlt.count(selected_item) > 1 else ""}')
         equipmentInfoLabel.configure(
-            text=f'Total: +{"".join([k[1] for k in equipmentsProperties if selected_item in k])}%')
+            text=f'Total: +{"".join([k[1] for k in equipmentProperties if selected_item in k])}%')
 
     equipmentWindow = Toplevel(root)
-    equipmentWindow.title('Equipments')
+    equipmentWindow.title('Equipment')
     equipmentWindow.resizable(False, False)
 
     mainequipmentFrame = Frame(equipmentWindow)
     mainequipmentFrame.grid(row=3, column=3, padx=5, pady=5)
 
-    Label(mainequipmentFrame, text=f'{username}\'s Equipments:', font=('Calibri', 18, 'bold')).grid(row=3, column=3,
-                                                                                                    columnspan=3,
-                                                                                                    pady=5)
+    Label(mainequipmentFrame, text=f'{username}\'s Equipment:', font=('Calibri', 18, 'bold')).grid(row=3, column=3,
+                                                                                                   columnspan=3,
+                                                                                                   pady=5)
     equipmentListbox = Listbox(mainequipmentFrame, listvariable=Variable(value=equipmentList), border=1,
                                selectmode=BROWSE,
                                font=('Calibri', 11, 'normal'))
@@ -441,6 +441,8 @@ def coinflip():
             betMoneyInput.insert(0, '$0')
         elif moneyValue == '$':
             betMoneyInput.insert(1, '0')
+        elif '$' not in moneyValue:
+            betMoneyInput.insert(0, '$')
         elif not moneyValue.isdigit():
             betMoneyInput.delete(0, END)
             betMoneyInput.insert(0,
@@ -472,22 +474,24 @@ def coinflip():
             def flipResult():
                 global money
                 result = random.choice(['Head', 'Tail'])
-                flipLabel.configure(text=f'The coin spins... \"{result}\" and you {"won" if result == faceChosen else "lost"}')
-                Label(flipWindow, text=f'${betValue*2 if result == faceChosen else betValue}', font=('Calibri', 16, 'bold'), foreground='#9c4051').grid(row=6, column=3)
+                flipLabel.configure(
+                    text=f'The coin spins... \"{result}\" and you {"won" if result == faceChosen else "lost"}')
+                Label(flipWindow, text=f'${betValue}',
+                      font=('Calibri', 16, 'bold'), foreground='#9c4051').grid(row=6, column=3)
                 if result == faceChosen:
                     money += betValue * 2
 
             betValue = int(moneyValue.replace('$', ''))
             money -= betValue
 
-            flipLabel = Label(flipWindow, text=f'{username} has spent {betValue} and chose {faceChosen}...')
-            flipLabel.grid(row=3, column=3)
-            root.after(1500, flipResult)
+            flipLabel = Label(flipWindow, text=f'{username} has spent ${betValue} and chose {faceChosen}...')
+            flipLabel.grid(row=3, column=3, pady=3, padx=5)
+            root.after(2500, flipResult)
 
         Label(faceChoice, text='Please select a face:', justify=LEFT).grid(row=3, column=3)
 
         faceChoiceCombobox = ttk.Combobox(faceChoice, values=['Head', 'Tail'], state='readonly')
-        faceChoiceCombobox.grid(row=5, column=3, sticky='ew')
+        faceChoiceCombobox.grid(row=5, column=3, sticky='ew', padx=3)
 
         flipButton = Button(faceChoice, text='FLIP', command=flipcoin)
         flipButton.grid(row=7, column=3)
@@ -521,8 +525,8 @@ manageText.grid(row=3, column=3, pady=5)
 petButton = Button(manageFrame, text='Pets', width=10, command=pet)
 petButton.grid(row=4, column=2, padx=10)
 
-# # # Equipments
-equipmentButton = Button(manageFrame, text='Equipments', width=10, command=equipment)
+# # # Equipment
+equipmentButton = Button(manageFrame, text='Equipment', width=10, command=equipment)
 equipmentButton.grid(row=4, column=3, padx=10)
 
 # # # Lootbox
