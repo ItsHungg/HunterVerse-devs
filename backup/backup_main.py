@@ -113,7 +113,7 @@ def loadingProcess():
             root.after(random.randint(2500, 5000), lambda: [root.deiconify(), mainProgressWindow.destroy()])
 
     mainProgressbar = ttk.Progressbar(mainProgressWindow, orient='horizontal', mode='determinate', length=500)
-    mainProgressbar.grid(row=4, column=3, sticky='ew')
+    mainProgressbar.grid(row=4, column=3, sticky='ew', padx=7)
 
     factsLabel = Label(mainProgressWindow, text=f'Facts: {random.choice(facts_trick)}', font=('Calibri', 10, 'bold'))
     factsLabel.grid(row=6, column=3)
@@ -167,6 +167,9 @@ def keyforLootboxFilter(x: str):
 
 # # Values DECLARATION
 money = 1000
+
+isCoinFlipOpened = False
+isLootboxOpened = False
 
 # # Pets DECLARATION
 petsPropertiesString = '''
@@ -327,7 +330,15 @@ def equipment():
 
 
 def lootbox():
-    global lootboxList
+    global lootboxList, isLootboxOpened
+    if isLootboxOpened:
+        return
+    isLootboxOpened = True
+    
+    def lootboxCallbackProtocol(master):
+        global isLootboxOpened
+        isLootboxOpened = False
+        master.destroy()
 
     def openLootbox():
         selected_index = lootboxListbox.curselection()[0]
@@ -358,6 +369,8 @@ def lootbox():
                                              foreground='#7609b5')
                     showResultLabel2.grid(row=4, column=3)
 
+                    showOpenResultWindow.protocol("WM_DELETE_WINDOW", lambda: lootboxCallbackProtocol(showOpenResultWindow))
+
                 if openProgressBar['value'] < 100:
                     openProgressBar['value'] += 1
                     openPercentShow.configure(text=f'Opening... ({int(openProgressBar["value"])}%)')
@@ -385,6 +398,7 @@ def lootbox():
             openProgressBar.grid(row=5, column=3, sticky='ew')
 
             root.after(1500, progress)
+            rollingWindow.protocol("WM_DELETE_WINDOW", lambda: lootboxCallbackProtocol(rollingWindow))
         else:
             lootboxWindow.lift()
 
@@ -425,13 +439,23 @@ def lootbox():
                                                                                                              sticky='ew',
                                                                                                              padx=10)
     lootboxListbox.bind('<<ListboxSelect>>', lootboxSelect)
+    lootboxWindow.protocol("WM_DELETE_WINDOW", lambda: lootboxCallbackProtocol(lootboxWindow))
 
 
 def coinflip():
-    global money
+    global money, isCoinFlipOpened
+    if isCoinFlipOpened:
+        return
+    isCoinFlipOpened = True
+
     coinflipWindow = Toplevel(root)
     coinflipWindow.title('Coinflip')
     coinflipWindow.resizable(False, False)
+
+    def cfCallbackProtocol(master):
+        global isCoinFlipOpened
+        isCoinFlipOpened = False
+        master.destroy()
 
     def moneyInputBind(_):
         global moneyValue
@@ -488,6 +512,8 @@ def coinflip():
             flipLabel.grid(row=3, column=3, pady=3, padx=5)
             root.after(2500, flipResult)
 
+            flipWindow.protocol("WM_DELETE_WINDOW", lambda: cfCallbackProtocol(flipWindow))
+
         Label(faceChoice, text='Please select a face:', justify=LEFT).grid(row=3, column=3)
 
         faceChoiceCombobox = ttk.Combobox(faceChoice, values=['Head', 'Tail'], state='readonly')
@@ -495,6 +521,8 @@ def coinflip():
 
         flipButton = Button(faceChoice, text='FLIP', command=flipcoin)
         flipButton.grid(row=7, column=3)
+
+        faceChoice.protocol("WM_DELETE_WINDOW", lambda: cfCallbackProtocol(faceChoice))
 
     mainCoinflipFrame = Frame(coinflipWindow)
     mainCoinflipFrame.grid(row=3, column=3)
@@ -512,6 +540,7 @@ def coinflip():
     flipcoinButton.grid(row=10, column=3)
 
     betMoneyInput.bind('<KeyRelease>', moneyInputBind)
+    coinflipWindow.protocol("WM_DELETE_WINDOW", lambda: cfCallbackProtocol(coinflipWindow))
 
 
 # # MANAGEMENT
