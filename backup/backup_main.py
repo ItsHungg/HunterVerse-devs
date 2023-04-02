@@ -35,11 +35,14 @@ def register():
     registerPage.resizable(False, False)
 
     def registerCallback(_):
-        maximumUsernameLengthLabel.configure(text=f'{len(usernameEntry.get())}/10')
+        maximumUsernameLengthLabel.configure(text=f'{"  " if len(usernameEntry.get()) < 10 else ""}{len(usernameEntry.get())}/10')
         if any(i in '`-=[]\\;\',/~!@#$%^&*()+{}|:\"<>?' for i in
                usernameEntry.get()) or usernameEntry.get().isdigit() or not 3 <= len(
             usernameEntry.get()) <= 10 or usernameEntry.get().count('_') > 1 or usernameEntry.get().count('.') > 1 or \
                 usernameEntry.get()[-1] in ['_', '.']:
+            if len(usernameEntry.get()) > 15:
+                usernameEntry.delete(15, END)
+                maximumUsernameLengthLabel.configure(text='15/10')
             submitregisterButton.configure(state=DISABLED)
             if len(usernameEntry.get()) == 0:
                 maximumUsernameLengthLabel.configure(foreground='black')
@@ -74,7 +77,7 @@ def register():
     usernameEntry = Entry(mainregisterFrame)
     usernameEntry.grid(row=5, column=5)
 
-    maximumUsernameLengthLabel = Label(mainregisterFrame, text='0/10')
+    maximumUsernameLengthLabel = Label(mainregisterFrame, text='  0/10')
     maximumUsernameLengthLabel.grid(row=5, column=6)
 
     submitregisterButton = Button(mainregisterFrame, text='Register', state=DISABLED, command=submitRegister)
@@ -334,7 +337,7 @@ def lootbox():
     if isLootboxOpened:
         return
     isLootboxOpened = True
-    
+
     def lootboxCallbackProtocol(master):
         global isLootboxOpened
         isLootboxOpened = False
