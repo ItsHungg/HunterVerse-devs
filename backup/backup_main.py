@@ -25,8 +25,10 @@ This game is created by Hung.
 This game is inspired by OwO Bot (a Discord bot).
 The name of them game is "{project_name}" for anyone who forgot.
 The current version of them game is: "{version}".
+You are reading this.
+You are breathing, aren\'t you?
 '''
-facts_trick = facts_tricks_string.strip().split('\n')
+facts_trick = random.choices(facts_tricks_string.strip().split('\n'), k=2)
 
 
 def register():
@@ -107,7 +109,7 @@ def loadingProcess():
         global repeatMainProgress
         if mainProgressbar['value'] < 100:
             if mainProgressbar['value'] == 49:
-                factsLabel.configure(text=f'Facts: {random.choice(facts_trick)}')
+                factsLabel.configure(text=f'Facts: {facts_trick[1]}')
             mainProgressbar['value'] += 1
             mainProgressValueLabel.configure(text=f'Initializing... ({int(mainProgressbar["value"])}%)')
             repeatMainProgress = root.after(random.randint(10, 500), startInit)
@@ -118,7 +120,7 @@ def loadingProcess():
     mainProgressbar = ttk.Progressbar(mainProgressWindow, orient='horizontal', mode='determinate', length=500)
     mainProgressbar.grid(row=4, column=3, sticky='ew', padx=7)
 
-    factsLabel = Label(mainProgressWindow, text=f'Facts: {random.choice(facts_trick)}', font=('Calibri', 10, 'bold'))
+    factsLabel = Label(mainProgressWindow, text=f'Facts: {facts_trick[0]}', font=('Calibri', 10, 'bold'))
     factsLabel.grid(row=6, column=3)
 
     mainProgressWindow.protocol("WM_DELETE_WINDOW", lambda: root.destroy())
