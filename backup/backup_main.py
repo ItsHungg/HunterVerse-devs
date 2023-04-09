@@ -26,7 +26,10 @@ This game is inspired by OwO Bot (a Discord bot).
 The name of them game is "{project_name}" for anyone who forgot.
 The current version of them game is: "{version}".
 You are reading this.
-You are breathing, aren\'t you?
+You are breathing.
+{int(time.time())}
+It\'s {time.strftime("%I:%M %p")} now.
+Today is {time.strftime("%A")}.
 '''
 facts_trick = random.choices(facts_tricks_string.strip().split('\n'), k=2)
 
@@ -37,7 +40,8 @@ def register():
     registerPage.resizable(False, False)
 
     def registerCallback(_):
-        maximumUsernameLengthLabel.configure(text=f'{"  " if len(usernameEntry.get()) < 10 else ""}{len(usernameEntry.get())}/10')
+        maximumUsernameLengthLabel.configure(
+            text=f'{"  " if len(usernameEntry.get()) < 10 else ""}{len(usernameEntry.get())}/10')
         if any(i in '`-=[]\\;\',/~!@#$%^&*()+{}|:\"<>?' for i in
                usernameEntry.get()) or usernameEntry.get().isdigit() or not 3 <= len(
             usernameEntry.get()) <= 10 or usernameEntry.get().count('_') > 1 or usernameEntry.get().count('.') > 1 or \
@@ -374,7 +378,8 @@ def lootbox():
                                              foreground='#7609b5')
                     showResultLabel2.grid(row=4, column=3)
 
-                    showOpenResultWindow.protocol("WM_DELETE_WINDOW", lambda: lootboxCallbackProtocol(showOpenResultWindow))
+                    showOpenResultWindow.protocol("WM_DELETE_WINDOW",
+                                                  lambda: lootboxCallbackProtocol(showOpenResultWindow))
 
                 if openProgressBar['value'] < 100:
                     openProgressBar['value'] += 1
@@ -439,10 +444,11 @@ def lootbox():
     lootboxOpenButton = Button(mainlootboxFrame, text='Open', state=DISABLED, command=openLootbox)
     lootboxOpenButton.grid(row=7, column=5, sticky='n')
 
-    Button(mainlootboxFrame, text='Close', command=lambda: lootboxWindow.destroy(), background='red', ).grid(row=70,
-                                                                                                             column=5,
-                                                                                                             sticky='ew',
-                                                                                                             padx=10)
+    Button(mainlootboxFrame, text='Close', command=lambda: lootboxCallbackProtocol(lootboxWindow),
+           background='red', ).grid(row=70,
+                                    column=5,
+                                    sticky='ew',
+                                    padx=10)
     lootboxListbox.bind('<<ListboxSelect>>', lootboxSelect)
     lootboxWindow.protocol("WM_DELETE_WINDOW", lambda: lootboxCallbackProtocol(lootboxWindow))
 
