@@ -1,3 +1,4 @@
+import webbrowser
 from tkinter import messagebox
 from tkinter import ttk
 from tkinter import *
@@ -30,6 +31,7 @@ You are breathing.
 {int(time.time())}
 It\'s {time.strftime("%I:%M %p")} now.
 Today is {time.strftime("%A")}.
+{"APRIL FOOLS BABY!!!" if time.strftime("%d/%m") == "01/04" else "THERE WILL BE A SURPRISE FOR YOU ON APRIL FOOLS!"}
 '''
 facts_trick = random.choices(facts_tricks_string.strip().split('\n'), k=2)
 
@@ -149,6 +151,22 @@ if register_need:
     register()
 else:
     loadingProcess()
+
+
+def aprilFools():
+    aprilFoolWindow = Toplevel()
+    aprilFoolWindow.title('Very Secret Version')
+
+    Label(aprilFoolWindow, text='Get free money\t->').grid(row=3, column=3, sticky='w')
+    Label(aprilFoolWindow, text='Get free robux\t->').grid(row=4, column=3, sticky='w')
+
+    freeMoneyButton = Button(aprilFoolWindow, text='CLICK HERE', command=lambda: webbrowser.open("https://youtu.be/0GeQVtZ6Rd4"))
+    freeRobuxButton = Button(aprilFoolWindow, text='CLICK HERE', command=lambda: webbrowser.open("https://youtu.be/dQw4w9WgXcQ"))
+
+    freeMoneyButton.grid(row=3, column=4)
+    freeRobuxButton.grid(row=4, column=4)
+
+    aprilFoolWindow.protocol("WM_DELETE_WINDOW", lambda: aprilFoolWindow.geometry(f'+{random.randint(10, 750)}+{random.randint(10, 500)}'))
 
 
 # DECLARATION
