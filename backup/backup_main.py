@@ -1,7 +1,7 @@
-import webbrowser
 from tkinter import messagebox
 from tkinter import ttk
 from tkinter import *
+import platform
 import random
 import time
 
@@ -13,6 +13,8 @@ root.resizable(False, False)
 root.title(f'{project_name} {version}')
 root.withdraw()
 
+with open(f'main.py') as getAllLine:
+    totalLines = len([i for i in getAllLine.readlines() if i != '\n'])
 with open('hunterverse\\assets\\user\\userdata.txt', 'r') as userget:
     if userget.read().strip() != '':
         register_need = False
@@ -31,9 +33,19 @@ You are breathing.
 {int(time.time())}
 It\'s {time.strftime("%I:%M %p")} now.
 Today is {time.strftime("%A")}.
-{"APRIL FOOLS BABY!!!" if time.strftime("%d/%m") == "01/04" else "THERE WILL BE A SURPRISE FOR YOU ON APRIL FOOLS!"}
+{"APRIL FOOLS BABY!!!" if time.strftime("%d/%m") == "01/04" else "Today is not April Fools"}
+At the initialization, there are always 2 facts.
+You can\'t resist against reading this line.
+{totalLines} line{"s" if totalLines > 1 else ""} of code!
 '''
-facts_trick = random.choices(facts_tricks_string.strip().split('\n'), k=2)
+facts_trick = random.sample(facts_tricks_string.strip().split('\n'), k=5)
+
+# GENERAL
+operator_sys = platform.system()
+
+
+def temp():
+    pass
 
 
 def register():
@@ -44,7 +56,7 @@ def register():
     def registerCallback(_):
         maximumUsernameLengthLabel.configure(
             text=f'{"  " if len(usernameEntry.get()) < 10 else ""}{len(usernameEntry.get())}/10')
-        if any(i in '`-=[]\\;\',/~!@#$%^&*()+{}|:\"<>?' for i in
+        if any(i in '`-=[]\\;\',/~!@#$%^&*()+{}|:\"<>? ' for i in
                usernameEntry.get()) or usernameEntry.get().isdigit() or not 3 <= len(
             usernameEntry.get()) <= 10 or usernameEntry.get().count('_') > 1 or usernameEntry.get().count('.') > 1 or \
                 usernameEntry.get()[-1] in ['_', '.']:
@@ -95,10 +107,6 @@ def register():
     usernameEntry.bind('<KeyRelease>', registerCallback)
 
 
-def temp():
-    pass
-
-
 def loadingProcess():
     global username
 
@@ -114,8 +122,12 @@ def loadingProcess():
     def startInit():
         global repeatMainProgress
         if mainProgressbar['value'] < 100:
-            if mainProgressbar['value'] == 49:
+            if mainProgressbar['value'] == 24:
                 factsLabel.configure(text=f'Facts: {facts_trick[1]}')
+            if mainProgressbar['value'] == 49:
+                factsLabel.configure(text=f'Facts: {facts_trick[2]}')
+            if mainProgressbar['value'] == 74:
+                factsLabel.configure(text=f'Facts: {facts_trick[3]}')
             mainProgressbar['value'] += 1
             mainProgressValueLabel.configure(text=f'Initializing... ({int(mainProgressbar["value"])}%)')
             repeatMainProgress = root.after(random.randint(10, 500), startInit)
@@ -147,26 +159,36 @@ def loadingProcess():
     mainProgressWindow.protocol("WM_DELETE_WINDOW", temp)
 
 
-if register_need:
+def notWindow():
+    diffOP = Toplevel(root)
+    diffOP.title('Warning')
+    Label(diffOP,
+          text=f'This game is programmed on Windows environment.\nIf you run on an another Operating System ({operator_sys}), some features might break.',
+          font=('Calibri', 11, 'bold'), foreground='#80211b').grid(row=2, column=3)
+
+    def tempCall(validator: str = None):
+        continueButton.configure(state=DISABLED)
+        quitButton.configure(state=DISABLED)
+        if validator is None:
+            root.after(random.randint(1500, 3000), lambda: exit())
+        else:
+            root.after(random.randint(2500, 5000), lambda: [diffOP.destroy(), register() if register_need else loadingProcess()])
+        return
+
+    continueButton = Button(diffOP, text='Yes, I understand what I am doing', width=30,
+                            command=lambda: tempCall('ur mama fat'))
+    quitButton = Button(diffOP, text='No, I don\'t want to continue', width=30, command=tempCall)
+
+    continueButton.grid(row=3, column=3)
+    quitButton.grid(row=4, column=3)
+
+
+if operator_sys != 'Windows':
+    notWindow()
+elif register_need:
     register()
 else:
     loadingProcess()
-
-
-def aprilFools():
-    aprilFoolWindow = Toplevel()
-    aprilFoolWindow.title('Very Secret Version')
-
-    Label(aprilFoolWindow, text='Get free money\t->').grid(row=3, column=3, sticky='w')
-    Label(aprilFoolWindow, text='Get free robux\t->').grid(row=4, column=3, sticky='w')
-
-    freeMoneyButton = Button(aprilFoolWindow, text='CLICK HERE', command=lambda: webbrowser.open("https://youtu.be/0GeQVtZ6Rd4"))
-    freeRobuxButton = Button(aprilFoolWindow, text='CLICK HERE', command=lambda: webbrowser.open("https://youtu.be/dQw4w9WgXcQ"))
-
-    freeMoneyButton.grid(row=3, column=4)
-    freeRobuxButton.grid(row=4, column=4)
-
-    aprilFoolWindow.protocol("WM_DELETE_WINDOW", lambda: aprilFoolWindow.geometry(f'+{random.randint(10, 750)}+{random.randint(10, 500)}'))
 
 
 # DECLARATION
@@ -188,7 +210,7 @@ def keyforWeaponsFilter(x: str):
 
 def keyforLootboxFilter(x: str):
     sortedLootbox = ['Basic Lootbox', 'Silver Lootbox', 'Copper Lootbox', 'Iron Lootbox', 'Golden Lootbox',
-                     'Diamond Lootbox', 'Emerald Lootbox', 'Special Lootbox']
+                     'Diamond Lootbox', 'Emerald Lootbox', 'Special Lootbox', 'Asian Lootbox']
     return sortedLootbox.index(x)
 
 
@@ -199,7 +221,7 @@ isCoinFlipOpened = False
 isLootboxOpened = False
 
 # # Pets DECLARATION
-petsPropertiesString = '''
+petsPropertiesString = f'''
 Dog.58:56
 Cat.52:46
 Elephant.68:85
@@ -214,6 +236,7 @@ Wolf.76:52
 Rat.38:27
 Fox.61:50
 Buffalo.80:76
+{"urmom.100:100" if time.strftime("%d/%m") == "01/04" else "Penguin.28:16"}
 '''
 
 petsProperties = [[i.split('.')[0], i.split('.')[1].split(':')] for i in petsPropertiesString.split('\n') if i != '']
@@ -222,11 +245,11 @@ petList = sorted(list(set(petListAlt.copy())), key=keyforPetsFilter, reverse=Tru
 # petList = sorted([x[0] for x in petsProperties], key=keyforPetsFilter, reverse=True)
 
 # # Equipment DECLARATION
-equipmentPropertiesString = '''
+equipmentPropertiesString = f'''
 Sword.10
 Hammer.10
 Axe.15
-Knife.3
+Knife.5
 Spear.7
 Crossbow.7
 Bow.5
@@ -234,6 +257,8 @@ Helmet.25
 Armor.30
 Leggings.20
 Boots.10
+Shovel.5
+Slippers.3
 Strength Poison 1.10
 Strength Poison 2.15
 Strength Poison 3.25
@@ -244,7 +269,7 @@ equipmentListAlt = []
 equipmentList = sorted(list(set(equipmentListAlt.copy())), key=keyforWeaponsFilter, reverse=True)
 
 # # Lootbox DECLARATION
-lootboxPropertiesString = '''
+lootboxPropertiesString = f'''
 Basic Lootbox.Knife:Bow:Spear
 Silver Lootbox.Knife:Bow:Crossbow:Spear:Sword
 Copper Lootbox.Knife:Bow:Crossbow:Spear:Sword:Hammer
@@ -252,7 +277,7 @@ Iron Lootbox.Knife:Bow:Crossbow:Spear:Sword:Hammer:Strength Poison 1
 Golden Lootbox.Bow:Crossbow:Spear:Sword:Hammer:Axe:Boots
 Diamond Lootbox.Bow:Spear:Sword:Hammer:Axe:Boots:Leggings:Strength Poison 2
 Emerald Lootbox.Sword:Hammer:Axe:Boots:Leggings:Armor:Helmet:Strength Poison 3
-Special Lootbox.Axe:Boots:Leggings:Armor:Helmet:Strength Poison 1:Strength Poison 2:Strength Poison 3
+{"Asian Lootbox.Slippers" if time.strftime("%d/%m") == "01/04" else "Special Lootbox.Axe:Boots:Leggings:Armor:Helmet:Strength Poison 1:Strength Poison 2:Strength Poison 3"}
 '''
 lootboxProperties = [[i.split('.')[0], i.split('.')[1].split(':')] for i in lootboxPropertiesString.split('\n') if
                      i != '']
@@ -422,8 +447,8 @@ def lootbox():
             openPercentShow = Label(mainRollingFrame, text='Opening... (0%)')
             openPercentShow.grid(row=4, column=3)
 
-            openProgressBar = ttk.Progressbar(mainRollingFrame, orient='horizontal', mode='determinate')
-            openProgressBar.grid(row=5, column=3, sticky='ew')
+            openProgressBar = ttk.Progressbar(mainRollingFrame, orient='horizontal', mode='determinate', length=250)
+            openProgressBar.grid(row=5, column=3, sticky='ew', padx=3)
 
             root.after(1500, progress)
             rollingWindow.protocol("WM_DELETE_WINDOW", lambda: lootboxCallbackProtocol(rollingWindow))
