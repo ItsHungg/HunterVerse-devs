@@ -12,3 +12,4 @@ Wolf.76:52
 Rat.38:27
 Fox.61:50
 Buffalo.80:76
+Penguin.28:16
