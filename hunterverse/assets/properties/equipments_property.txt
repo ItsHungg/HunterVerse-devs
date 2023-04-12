@@ -1,7 +1,7 @@
 Sword.10
-Hammer.5
+Hammer.10
 Axe.15
-Knife.3
+Knife.5
 Spear.7
 Crossbow.7
 Bow.5
@@ -9,3 +9,8 @@ Helmet.25
 Armor.30
 Leggings.20
 Boots.10
+Shovel.5
+Slippers.3
+Strength Poison 1.10
+Strength Poison 2.15
+Strength Poison 3.25
