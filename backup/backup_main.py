@@ -6,7 +6,7 @@ import random
 import time
 
 project_name = 'HunterVerse'
-version = '0.9.2.3'
+version = '0.9.2.5'
 version_code = sum(list(map(int, version.split('.'))))
 root = Tk()
 root.resizable(False, False)
@@ -26,11 +26,10 @@ The more valuable the lootbox is, the longer it takes to open it.
 A username can only have from 3 to 10 characters!
 This game is created by Hung.
 This game is inspired by OwO Bot (a Discord bot).
-The name of them game is "{project_name}" for anyone who forgot.
-The current version of them game is: "{version}".
+The name of the game is "{project_name}" for anyone who forgot.
+The current version of the game is: "{version}".
 You are reading this.
 You are breathing.
-{int(time.time())}
 It\'s {time.strftime("%I:%M %p")} now.
 Today is {time.strftime("%A")}.
 {"APRIL FOOLS BABY!!!" if time.strftime("%d/%m") == "01/04" else "Today is not April Fools"}
@@ -56,10 +55,9 @@ def register():
     def registerCallback(_):
         maximumUsernameLengthLabel.configure(
             text=f'{"  " if len(usernameEntry.get()) < 10 else ""}{len(usernameEntry.get())}/10')
-        if any(i in '`-=[]\\;\',/~!@#$%^&*()+{}|:\"<>? ' for i in
-               usernameEntry.get()) or usernameEntry.get().isdigit() or not 3 <= len(
-            usernameEntry.get()) <= 10 or usernameEntry.get().count('_') > 1 or usernameEntry.get().count('.') > 1 or \
-                usernameEntry.get()[-1] in ['_', '.']:
+        if any(i in '`-=[]\\;\',/~!@#$%^&*()+{}|:\"<>?. ' for i in
+               usernameEntry.get()) or usernameEntry.get().isdigit() or not 3 <= len(usernameEntry.get()) <= 10 or \
+                usernameEntry.get().count('_') > 1 or usernameEntry.get()[-1] in ['_', '.']:
             if len(usernameEntry.get()) > 15:
                 usernameEntry.delete(15, END)
                 maximumUsernameLengthLabel.configure(text='15/10')
@@ -91,14 +89,14 @@ def register():
     mainregisterFrame.grid(row=3, column=3)
 
     registerHeader = Label(mainregisterFrame, text='Register', font=('Calibri', 15, 'bold'))
-    registerHeader.grid(row=3, column=3, columnspan=4)
+    registerHeader.grid(row=3, column=3, columnspan=4, pady=3)
 
-    Label(mainregisterFrame, text='Username: ').grid(row=5, column=4)
+    Label(mainregisterFrame, text='Username:').grid(row=5, column=4, padx=2)
     usernameEntry = Entry(mainregisterFrame)
     usernameEntry.grid(row=5, column=5)
 
     maximumUsernameLengthLabel = Label(mainregisterFrame, text='  0/10')
-    maximumUsernameLengthLabel.grid(row=5, column=6)
+    maximumUsernameLengthLabel.grid(row=5, column=6, padx=3)
 
     submitregisterButton = Button(mainregisterFrame, text='Register', state=DISABLED, command=submitRegister)
     submitregisterButton.grid(row=9, column=3, columnspan=4)
@@ -172,7 +170,8 @@ def notWindow():
         if validator is None:
             root.after(random.randint(1500, 3000), lambda: exit())
         else:
-            root.after(random.randint(2500, 5000), lambda: [diffOP.destroy(), register() if register_need else loadingProcess()])
+            root.after(random.randint(2500, 5000),
+                       lambda: [diffOP.destroy(), register() if register_need else loadingProcess()])
         return
 
     continueButton = Button(diffOP, text='Yes, I understand what I am doing', width=30,
@@ -523,11 +522,10 @@ def coinflip():
             betMoneyInput.insert(0, '$')
         elif not moneyValue.isdigit():
             betMoneyInput.delete(0, END)
-            betMoneyInput.insert(0,
-                                 f'${"0" if moneyValue == "$" else ""}{str(int("".join([i for i in moneyValue if i.isdigit()]))) if int("".join([i for i in moneyValue if i.isdigit()])) <= money else str(money)}')
+            betMoneyInput.insert(0, f'${"0" if moneyValue == "$" else str(int("".join([i for i in moneyValue if i.isdigit()])))}')
 
         if betMoneyInput.get().replace('$', '').isdigit() and int(
-                betMoneyInput.get().replace('$', '')) <= money and int(betMoneyInput.get().replace('$', '')) != 0:
+                betMoneyInput.get().replace('$', '')) <= money and 0 < int(betMoneyInput.get().replace('$', '')) <= 50000:
             flipcoinButton.configure(state=NORMAL)
         else:
             flipcoinButton.configure(state=DISABLED)
@@ -568,20 +566,27 @@ def coinflip():
 
             flipWindow.protocol("WM_DELETE_WINDOW", lambda: cfCallbackProtocol(flipWindow))
 
-        Label(faceChoice, text='Please select a face:', justify=LEFT).grid(row=3, column=3)
+        Label(faceChoice, text='Please select a face:').grid(row=3, column=3)
 
         faceChoiceCombobox = ttk.Combobox(faceChoice, values=['Head', 'Tail'], state='readonly')
         faceChoiceCombobox.grid(row=5, column=3, sticky='ew', padx=3)
 
-        flipButton = Button(faceChoice, text='FLIP', command=flipcoin)
+        flipButton = Button(faceChoice, text='FLIP', command=flipcoin, state=DISABLED)
         flipButton.grid(row=7, column=3)
 
+        def flipfaceValidator(_):
+            if faceChoiceCombobox.get() == '':
+                flipButton.configure(state=DISABLED)
+            else:
+                flipButton.configure(state=NORMAL)
+
+        faceChoiceCombobox.bind('<<ComboboxSelected>>', flipfaceValidator)
         faceChoice.protocol("WM_DELETE_WINDOW", lambda: cfCallbackProtocol(faceChoice))
 
     mainCoinflipFrame = Frame(coinflipWindow)
     mainCoinflipFrame.grid(row=3, column=3)
 
-    Label(mainCoinflipFrame, text=f'Coinflip (GAMBLING)', font=('Calibri', 18, 'bold')).grid(row=3, column=3, pady=5)
+    Label(mainCoinflipFrame, text=f'Coinflip', font=('Calibri', 18, 'bold')).grid(row=3, column=3, padx=35, pady=5)
 
     moneyShowLabel = Label(mainCoinflipFrame, text=f'Cash: ${money}')
     moneyShowLabel.grid(row=5, column=3)
@@ -595,6 +600,10 @@ def coinflip():
 
     betMoneyInput.bind('<KeyRelease>', moneyInputBind)
     coinflipWindow.protocol("WM_DELETE_WINDOW", lambda: cfCallbackProtocol(coinflipWindow))
+
+
+def hunt():
+    pass
 
 
 # # MANAGEMENT
