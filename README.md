@@ -17,6 +17,16 @@ pip install tk
 > 5. Wait for the application to process. It usually takes from 3 to 5 seconds.
 > 5. Then, you should see the game starts initializing.
 > 6. Wait for the initialization to finish and enjoy the game!
+* Also, if you want to run the back-up file (early access to the newest version), you can do like below:
+> 1. After downloading a `.rar` or `.zip` file, unzip it.
+> 2. After you unzip the file into a folder, you should see a folder named `backup`.
+> 3. Open that folder, you will see a single `.py` file named `backup_main.py`.
+> 4. Move that file into the main directory (where the `main.py` is located).
+> 5. Then, open that `backup_main.py` file. You will see a register window and a terminal.
+> 6. Ignore the terminal, just enter your username into the entry field and press the `Register` button.
+> 7. Wait for the application to process. It usually takes from 3 to 5 seconds.
+> 8. Then, you should see the game starts initializing.
+> 9. Wait for the initialization to finish and enjoy the newest version of the game!
 
 ### FAQ (Frequently-Asked-Questions)
 (*There is no FAQs available yet*)
@@ -25,7 +35,8 @@ pip install tk
 
 ## Information
 Project Name: **HunterVerse**<br>
-Project Version: `0.9.2.1` (**BETA**)<br><br>
+Project Main File's Version: `0.9.2.1` (**BETA**)<br>
+Last Checked Version: `0.9.2.5`<br><br>
 
 <hr>
 
