@@ -71,6 +71,7 @@ def register():
             maximumUsernameLengthLabel.configure(foreground='black')
 
     def submitRegister():
+        usernameEntry.unbind('<KeyRelease>')
         submitregisterButton.configure(state=DISABLED)
         usernameEntry.configure(state=DISABLED)
         with open('hunterverse\\assets\\user\\userdata.txt', 'w') as saveRegister:
