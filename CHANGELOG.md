@@ -4,7 +4,7 @@ All changes to this project will be documented in this file!
 **Format:** `[x.y.z] - mm/dd/yyyy`
 <hr>
 
-## [0.9.2.x] - 04/14/2023
+## [[0.9.2.x]](https://sites.google.com/view/project-hunterverse/versions?authuser=0#h.6aucpw48oqvp) - 04/14/2023
 ### Added
  - Added `padx` and `pady` for Registration GUI window
  - Added April Fools update
@@ -22,3 +22,11 @@ All changes to this project will be documented in this file!
  - Fixed wrong money profit display after flipping a coin
  - Fixed a few minor grammar/spelling issues
  - Fixed 2 windows can be opened at once
+
+## [[0.9.1.x]](https://sites.google.com/view/project-hunterverse/versions?authuser=0#h.gpkfb2v6k56g) - 03/26/2023
+### Added
+ - Added Register system
+### Fixed
+ - Fixed the background running after closing the Registration window (major bug)
+
+<hr>
