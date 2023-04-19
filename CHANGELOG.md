@@ -4,6 +4,15 @@ All changes to this project will be documented in this file!
 **Format:** `[x.y.z] - mm/dd/yyyy`
 <hr>
 
+## [0.9.3.x] - 04/19/2023
+### Added
+ - Added hunting system
+ - Added Buying feature (you can buy lootboxes here)
+### Changed
+ - Changed the padding system for the GUI
+### Removed
+ - Removed the Daily feature (earn daily money)
+ - Removed 1 fact
 ## [[0.9.2.x]](https://sites.google.com/view/project-hunterverse/versions?authuser=0#h.6aucpw48oqvp) - 04/14/2023
 ### Added
  - Added `padx` and `pady` for Registration GUI window
