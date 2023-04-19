@@ -6,15 +6,13 @@ import random
 import time
 
 project_name = 'HunterVerse'
-version = '0.9.2.5'
+version = '0.9.3'
 version_code = sum(list(map(int, version.split('.'))))
 root = Tk()
 root.resizable(False, False)
 root.title(f'{project_name} {version}')
 root.withdraw()
 
-with open(f'main.py') as getAllLine:
-    totalLines = len([i for i in getAllLine.readlines() if i != '\n'])
 with open('hunterverse\\assets\\user\\userdata.txt', 'r') as userget:
     if userget.read().strip() != '':
         register_need = False
@@ -35,7 +33,6 @@ Today is {time.strftime("%A")}.
 {"APRIL FOOLS BABY!!!" if time.strftime("%d/%m") == "01/04" else "Today is not April Fools"}
 At the initialization, there are always 2 facts.
 You can\'t resist against reading this line.
-{totalLines} line{"s" if totalLines > 1 else ""} of code!
 '''
 facts_trick = random.sample(facts_tricks_string.strip().split('\n'), k=5)
 
@@ -112,7 +109,7 @@ def loadingProcess():
     mainProgressWindow = Toplevel(root)
     mainProgressWindow.title('Initialization')
     mainProgressValueLabel = Label(mainProgressWindow, text='Initializing... (0%)', font=('Calibri', 13, 'bold'))
-    mainProgressValueLabel.grid(row=3, column=3, sticky='ew')
+    mainProgressValueLabel.grid(row=3, column=3, sticky='ew', pady=5)
     mainProgressWindow.resizable(False, False)
 
     with open('hunterverse\\assets\\user\\userdata.txt', 'r') as setUsername:
@@ -198,6 +195,13 @@ def average(*args):
     return sum(args) / len(args)
 
 
+def keyforPetsPropertiesFilter(x: str):
+    i = x[0]
+    properties = [[i.split('.')[0], i.split('.')[1].split(':')] for i in petsPropertiesString.split('\n') if i != '']
+    return int(average(int("".join([k[1][0] for k in properties if i in k])),
+                       int("".join([k[1][1] for k in properties if i in k]))))
+
+
 def keyforPetsFilter(x: str):
     return int(average(int("".join([k[1][0] for k in petsProperties if x in k])),
                        int("".join([k[1][1] for k in petsProperties if x in k]))))
@@ -219,6 +223,7 @@ money = 1000
 
 isCoinFlipOpened = False
 isLootboxOpened = False
+isHuntingOpened = False
 
 # # Pets DECLARATION
 petsPropertiesString = f'''
@@ -239,7 +244,7 @@ Buffalo.80:76
 {"urmom.100:100" if time.strftime("%d/%m") == "01/04" else "Penguin.28:16"}
 '''
 
-petsProperties = [[i.split('.')[0], i.split('.')[1].split(':')] for i in petsPropertiesString.split('\n') if i != '']
+petsProperties = sorted([[i.split('.')[0], i.split('.')[1].split(':')] for i in petsPropertiesString.split('\n') if i != ''], key=keyforPetsPropertiesFilter, reverse=True)
 petListAlt = []
 petList = sorted(list(set(petListAlt.copy())), key=keyforPetsFilter, reverse=True)
 # petList = sorted([x[0] for x in petsProperties], key=keyforPetsFilter, reverse=True)
@@ -414,7 +419,7 @@ def lootbox():
                     rollingWindow.destroy()
 
                     showResultLabel1 = Label(showOpenResultWindow,
-                                             text=f'You\'ve just discovered a{" pair of" if itemOpened in ["Boots"] else ""}{"n" if itemOpened[0] in "UEOAI" and itemOpened not in ["Boots"] else ""}...')
+                                             text=f'You\'ve just discovered a{" pair of" if itemOpened in ["Boots"] else ""}{"n" if itemOpened[0] in "UEOAI" and itemOpened not in ["Boots", "Slippers"] else ""}...')
                     showResultLabel1.grid(row=3, column=3)
 
                     showResultLabel2 = Label(showOpenResultWindow, text=itemOpened, font=('Calibri', 16, 'bold'),
@@ -498,7 +503,7 @@ def lootbox():
 
 def coinflip():
     global money, isCoinFlipOpened
-    if isCoinFlipOpened:
+    if isCoinFlipOpened or isHuntingOpened:
         return
     isCoinFlipOpened = True
 
@@ -549,7 +554,7 @@ def coinflip():
             faceChoice.destroy()
 
             def flipResult():
-                global money
+                global money, isCoinFlipOpened
                 result = random.choice(['Head', 'Tail'])
                 flipLabel.configure(
                     text=f'The coin spins... \"{result}\" and you {"won" if result == faceChosen else "lost"}')
@@ -557,6 +562,7 @@ def coinflip():
                       font=('Calibri', 16, 'bold'), foreground='#9c4051').grid(row=6, column=3)
                 if result == faceChosen:
                     money += betValue * 2
+                isCoinFlipOpened = False
 
             betValue = int(moneyValue.replace('$', ''))
             money -= betValue
@@ -597,14 +603,76 @@ def coinflip():
     betMoneyInput.grid(row=7, column=3)
 
     flipcoinButton = Button(mainCoinflipFrame, text='Next', state=DISABLED, command=chooseFace)
-    flipcoinButton.grid(row=10, column=3)
+    flipcoinButton.grid(row=10, column=3, pady=(0, 10))
 
     betMoneyInput.bind('<KeyRelease>', moneyInputBind)
     coinflipWindow.protocol("WM_DELETE_WINDOW", lambda: cfCallbackProtocol(coinflipWindow))
 
 
 def hunt():
-    pass
+    global isHuntingOpened
+    if isHuntingOpened or isCoinFlipOpened:
+        return
+    isHuntingOpened = True
+
+    def huntingCallbackProtocol(master):
+        global isHuntingOpened
+        isHuntingOpened = False
+        master.destroy()
+
+    huntWindow = Toplevel(root)
+    huntWindow.title('Hunt')
+    huntWindow.resizable(False, False)
+
+    def huntPet():
+        petHuntingProgressWindow = Toplevel()
+        petHuntingProgressWindow.title('Hunting...')
+        petHuntingProgressWindow.resizable(False, False)
+        huntWindow.destroy()
+
+        def showHuntResult():
+            global money, petListAlt, petList, isHuntingOpened
+            huntResultWindow = Toplevel()
+            huntResultWindow.title('Hunting Result')
+            huntResultWindow.resizable(False, False)
+            petHuntingProgressWindow.destroy()
+
+            money -= 5
+            huntingResult = random.choices([x[0] for x in petsProperties], weights=list(range(1, len(petsProperties)+1)))[0]
+            petListAlt.append(huntingResult)
+            petList = sorted(list(set(petListAlt.copy())), key=keyforPetsFilter, reverse=True)
+
+            showResultLabel1 = Label(huntResultWindow, text=f'You spent $5 and caught a{"n" if huntingResult[0] in "UEOAI" else ""}...')
+            showResultLabel1.grid(row=3, column=3)
+
+            showResultLabel2 = Label(huntResultWindow, text=huntingResult, font=('Calibri', 16, 'bold'),   foreground='#2b5580')
+            showResultLabel2.grid(row=4, column=3)
+
+            isHuntingOpened = False
+
+        def huntingProgress():
+            if huntingProgressbar['value'] < 100:
+                showHuntingProgression.configure(text=f'Hunting for it... ({int(huntingProgressbar["value"])}%)')
+                huntingProgressbar['value'] += random.randint(1, 3)
+                root.after(random.randint(10, 250), huntingProgress)
+            else:
+                showHuntingProgression.configure(text=f'Processing... (100%)')
+                root.after(random.randint(1000, 2500), showHuntResult)
+
+        showHuntingProgression = Label(petHuntingProgressWindow, text='Looking for a good pet... (0%)')
+        huntingProgressbar = ttk.Progressbar(petHuntingProgressWindow, orient='horizontal', length=250)
+        showHuntingProgression.grid(row=3, column=3, pady=(3, 0))
+        huntingProgressbar.grid(row=5, column=3, padx=10, pady=5)
+
+        root.after(random.randint(500, 1500), huntingProgress)
+        petHuntingProgressWindow.protocol("WM_DELETE_WINDOW", lambda: huntingCallbackProtocol(petHuntingProgressWindow))
+
+    Label(huntWindow, text='Hunting', font=('Calibri', 25, 'bold')).grid(row=3, column=3, sticky='nsew', pady=10)
+    Label(huntWindow, text='Start hunting by pressing on the below button:', font=('Calibri', 10, 'normal')).grid(row=5, column=3, sticky='nsew', padx=10)
+    huntButton = Button(huntWindow, text='Hunt (-$5)', width=15, command=huntPet)
+    huntButton.grid(row=7, column=3, pady=(10, 15))
+
+    huntWindow.protocol("WM_DELETE_WINDOW", lambda: huntingCallbackProtocol(huntWindow))
 
 
 # # MANAGEMENT
@@ -654,7 +722,7 @@ economyFrame.grid(row=8, column=3)
 economyText = Label(economyFrame, text='Economy', font=('Calibri', 15, 'bold'))
 economyText.grid(row=3, column=3, pady=5)
 
-# # # Buy/Shop
+# # # Shop
 buyButton = Button(economyFrame, text='Shop', width=10)
 buyButton.grid(row=4, column=2, padx=14)
 
@@ -662,8 +730,8 @@ buyButton.grid(row=4, column=2, padx=14)
 cashButton = Button(economyFrame, text='Currency', width=10)
 cashButton.grid(row=4, column=3, padx=14)
 
-# # # Daily
-dailyButton = Button(economyFrame, text='Daily', width=10)
+# # # Buy
+dailyButton = Button(economyFrame, text='Buy', width=10)
 dailyButton.grid(row=4, column=4, padx=14)
 
 # # ACTION
@@ -674,7 +742,7 @@ actionText = Label(actionFrame, text='Action', font=('Calibri', 15, 'bold'))
 actionText.grid(row=3, column=3, pady=5)
 
 # # # Hunting
-huntingButton = Button(actionFrame, text='Hunt', width=10)
+huntingButton = Button(actionFrame, text='Hunt', width=10, command=hunt)
 huntingButton.grid(row=4, column=2, padx=14)
 
 # # # Battle
