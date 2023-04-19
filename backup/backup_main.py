@@ -668,8 +668,8 @@ def hunt():
         petHuntingProgressWindow.protocol("WM_DELETE_WINDOW", lambda: huntingCallbackProtocol(petHuntingProgressWindow))
 
     Label(huntWindow, text='Hunting', font=('Calibri', 25, 'bold')).grid(row=3, column=3, sticky='nsew', pady=10)
-    Label(huntWindow, text='Start hunting by pressing on the below button:', font=('Calibri', 10, 'normal')).grid(row=5, column=3, sticky='nsew', padx=10)
-    huntButton = Button(huntWindow, text='Hunt (-$5)', width=15, command=huntPet)
+    Label(huntWindow, text=f'{"Start hunting by pressing on the below button:" if money >= 5 else "Not enough money. You need to go and get a real job:"}', font=('Calibri', 10, 'normal')).grid(row=5, column=3, sticky='nsew', padx=10)
+    huntButton = Button(huntWindow, text=f'{"Hunt (-$5)" if money >= 5 else "Go get a job"}', width=15, command=huntPet, state=f'{"disable" if money < 5 else "normal"}')
     huntButton.grid(row=7, column=3, pady=(10, 15))
 
     huntWindow.protocol("WM_DELETE_WINDOW", lambda: huntingCallbackProtocol(huntWindow))
