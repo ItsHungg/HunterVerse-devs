@@ -6,21 +6,21 @@ import random
 import time
 
 project_name = 'HunterVerse'
-version = '0.9.3'
+version = '0.9.3.5'
 version_code = sum(list(map(int, version.split('.'))))
 root = Tk()
 root.resizable(False, False)
 root.title(f'{project_name} {version}')
 root.withdraw()
 
-with open('hunterverse\\assets\\user\\userdata.txt', 'r') as userget:
+with open('hunterverse\\assets\\user\\userdata.py', 'r') as userget:
     if userget.read().strip() != '':
         register_need = False
     else:
         register_need = True
 
 facts_tricks_string = f'''
-The more valuable the lootbox is, the longer it takes to open it.
+The more valuable a lootbox is, the longer it takes to open it.
 A username can only have from 3 to 10 characters!
 This game is created by Hung.
 This game is inspired by OwO Bot (a Discord bot).
@@ -31,13 +31,14 @@ You are breathing.
 It\'s {time.strftime("%I:%M %p")} now.
 Today is {time.strftime("%A")}.
 {"APRIL FOOLS BABY!!!" if time.strftime("%d/%m") == "01/04" else "Today is not April Fools"}
-At the initialization, there are always 2 facts.
+At the initialization, there are always 4 facts.
 You can\'t resist against reading this line.
 '''
 facts_trick = random.sample(facts_tricks_string.strip().split('\n'), k=5)
 
 # GENERAL
 operator_sys = platform.system()
+isMainStarted = False
 
 
 def temp():
@@ -52,7 +53,7 @@ def register():
     def registerCallback(_):
         maximumUsernameLengthLabel.configure(
             text=f'{"  " if len(usernameEntry.get()) < 10 else ""}{len(usernameEntry.get())}/10')
-        if any(i in '`-=[]\\;\',/~!@#$%^&*()+{}|:\"<>?. ' for i in
+        if any(i not in '1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM' for i in
                usernameEntry.get()) or usernameEntry.get().isdigit() or not 3 <= len(usernameEntry.get()) <= 10 or \
                 usernameEntry.get().count('_') > 1 or usernameEntry.get()[-1] in ['_', '.']:
             if len(usernameEntry.get()) > 15:
@@ -71,9 +72,9 @@ def register():
         usernameEntry.unbind('<KeyRelease>')
         submitregisterButton.configure(state=DISABLED)
         usernameEntry.configure(state=DISABLED)
-        with open('hunterverse\\assets\\user\\userdata.txt', 'w') as saveRegister:
+        with open('hunterverse\\assets\\user\\userdata.py', 'w') as saveRegister:
             saveRegister.write(
-                f'{usernameEntry.get()}%{time.strftime("%m-%d-%Y")}%{time.strftime("%T")}%{int(time.time())}')
+                f'# {usernameEntry.get()}%{time.strftime("%m-%d-%Y")}%{time.strftime("%T")}%{int(time.time())}%1000\n')
 
         Label(registerPage, text='Processing...', font=('Calibri', 11, 'bold')).grid(row=10, column=3, columnspan=3,
                                                                                      pady=5)
@@ -104,7 +105,7 @@ def register():
 
 
 def loadingProcess():
-    global username
+    global username, money
 
     mainProgressWindow = Toplevel(root)
     mainProgressWindow.title('Initialization')
@@ -112,11 +113,23 @@ def loadingProcess():
     mainProgressValueLabel.grid(row=3, column=3, sticky='ew', pady=5)
     mainProgressWindow.resizable(False, False)
 
-    with open('hunterverse\\assets\\user\\userdata.txt', 'r') as setUsername:
-        username = setUsername.read().strip().split('%')[0]
+    with open('hunterverse\\assets\\user\\userdata.py', 'r') as setUser:
+        userString = setUser.read().replace('#', '').strip().split('%')
+        username = userString[0]
+        money = int(userString[4])
 
     def startInit():
         global repeatMainProgress
+
+        def endProgress():
+            global isMainStarted
+            mainProgressWindow.destroy()
+            root.deiconify()
+            isMainStarted = True
+
+            if register_need and isMainStarted:
+                root.after(250, lambda: messagebox.showinfo('Claim Confirmed', f'You have claimed ${money} as a STARTER GIFT!'))
+
         if mainProgressbar['value'] < 100:
             if mainProgressbar['value'] == 24:
                 factsLabel.configure(text=f'Facts: {facts_trick[1]}')
@@ -129,7 +142,8 @@ def loadingProcess():
             repeatMainProgress = root.after(random.randint(10, 500), startInit)
         else:
             mainProgressValueLabel.configure(text=f'Successfully run: {project_name} {version}')
-            root.after(random.randint(2500, 5000), lambda: [root.deiconify(), mainProgressWindow.destroy()])
+            factsLabel.configure(text=f'Thanks for playing {project_name}. Now, enjoy your game!', foreground='#350c4f')
+            root.after(random.randint(2500, 5000), endProgress)
 
     mainProgressbar = ttk.Progressbar(mainProgressWindow, orient='horizontal', mode='determinate', length=500)
     mainProgressbar.grid(row=4, column=3, sticky='ew', padx=7)
@@ -162,10 +176,10 @@ def notWindow():
           text=f'This game is programmed on Windows environment.\nIf you run on an another Operating System ({operator_sys}), some features might break.',
           font=('Calibri', 11, 'bold'), foreground='#80211b').grid(row=2, column=3)
 
-    def tempCall(validator: str = None):
+    def tempCall(validator: bool = False):
         continueButton.configure(state=DISABLED)
         quitButton.configure(state=DISABLED)
-        if validator is None:
+        if not validator:
             root.after(random.randint(1500, 3000), lambda: exit())
         else:
             root.after(random.randint(2500, 5000),
@@ -173,7 +187,7 @@ def notWindow():
         return
 
     continueButton = Button(diffOP, text='Yes, I understand what I am doing', width=30,
-                            command=lambda: tempCall('ur mama fat'))
+                            command=lambda: tempCall(True))
     quitButton = Button(diffOP, text='No, I don\'t want to continue', width=30, command=tempCall)
 
     continueButton.grid(row=3, column=3)
@@ -219,8 +233,6 @@ def keyforLootboxFilter(x: str):
 
 
 # # Values DECLARATION
-money = 1000
-
 isCoinFlipOpened = False
 isLootboxOpened = False
 isHuntingOpened = False
@@ -244,7 +256,9 @@ Buffalo.80:76
 {"urmom.100:100" if time.strftime("%d/%m") == "01/04" else "Penguin.28:16"}
 '''
 
-petsProperties = sorted([[i.split('.')[0], i.split('.')[1].split(':')] for i in petsPropertiesString.split('\n') if i != ''], key=keyforPetsPropertiesFilter, reverse=True)
+petsProperties = sorted(
+    [[i.split('.')[0], i.split('.')[1].split(':')] for i in petsPropertiesString.split('\n') if i != ''],
+    key=keyforPetsPropertiesFilter, reverse=True)
 petListAlt = []
 petList = sorted(list(set(petListAlt.copy())), key=keyforPetsFilter, reverse=True)
 # petList = sorted([x[0] for x in petsProperties], key=keyforPetsFilter, reverse=True)
@@ -419,7 +433,7 @@ def lootbox():
                     rollingWindow.destroy()
 
                     showResultLabel1 = Label(showOpenResultWindow,
-                                             text=f'You\'ve just discovered a{" pair of" if itemOpened in ["Boots"] else ""}{"n" if itemOpened[0] in "UEOAI" and itemOpened not in ["Boots", "Slippers"] else ""}...')
+                                             text=f'You\'ve just discovered{"" if itemOpened in ["Leggings"] else " a"}{" pair of" if itemOpened in ["Boots"] else ""}{"n" if itemOpened[0] in "UEOAI" and itemOpened not in ["Boots", "Slippers"] else ""}...')
                     showResultLabel1.grid(row=3, column=3)
 
                     showResultLabel2 = Label(showOpenResultWindow, text=itemOpened, font=('Calibri', 16, 'bold'),
@@ -528,7 +542,8 @@ def coinflip():
             betMoneyInput.insert(0, '$')
         elif not moneyValue.isdigit():
             betMoneyInput.delete(0, END)
-            betMoneyInput.insert(0, f'${"0" if moneyValue == "$" else str(int("".join([i for i in moneyValue if i.isdigit()])))}')
+            betMoneyInput.insert(0,
+                                 f'${"0" if moneyValue == "$" else str(int("".join([i for i in moneyValue if i.isdigit()])))}')
 
         if betMoneyInput.get().replace('$', '').isdigit() and int(
                 betMoneyInput.get().replace('$', '')) <= money and 0 < int(betMoneyInput.get().replace('$', '')) <= 50000:
@@ -638,14 +653,17 @@ def hunt():
             petHuntingProgressWindow.destroy()
 
             money -= 5
-            huntingResult = random.choices([x[0] for x in petsProperties], weights=list(range(1, len(petsProperties)+1)))[0]
+            huntingResult = \
+                random.choices([x[0] for x in petsProperties], weights=list(range(1, len(petsProperties) + 1)))[0]
             petListAlt.append(huntingResult)
             petList = sorted(list(set(petListAlt.copy())), key=keyforPetsFilter, reverse=True)
 
-            showResultLabel1 = Label(huntResultWindow, text=f'You spent $5 and caught a{"n" if huntingResult[0] in "UEOAI" else ""}...')
+            showResultLabel1 = Label(huntResultWindow,
+                                     text=f'You spent $5 and caught a{"n" if huntingResult[0] in "UEOAI" else ""}...')
             showResultLabel1.grid(row=3, column=3)
 
-            showResultLabel2 = Label(huntResultWindow, text=huntingResult, font=('Calibri', 16, 'bold'),   foreground='#2b5580')
+            showResultLabel2 = Label(huntResultWindow, text=huntingResult, font=('Calibri', 16, 'bold'),
+                                     foreground='#2b5580')
             showResultLabel2.grid(row=4, column=3)
 
             isHuntingOpened = False
@@ -668,8 +686,11 @@ def hunt():
         petHuntingProgressWindow.protocol("WM_DELETE_WINDOW", lambda: huntingCallbackProtocol(petHuntingProgressWindow))
 
     Label(huntWindow, text='Hunting', font=('Calibri', 25, 'bold')).grid(row=3, column=3, sticky='nsew', pady=10)
-    Label(huntWindow, text=f'{"Start hunting by pressing on the below button:" if money >= 5 else "Not enough money. You need to go and get a real job:"}', font=('Calibri', 10, 'normal')).grid(row=5, column=3, sticky='nsew', padx=10)
-    huntButton = Button(huntWindow, text=f'{"Hunt (-$5)" if money >= 5 else "Go get a job"}', width=15, command=huntPet, state=f'{"disable" if money < 5 else "normal"}')
+    Label(huntWindow,
+          text=f'{"Start hunting by pressing on the below button:" if money >= 5 else "Not enough money. You need to go and get a real job:"}',
+          font=('Calibri', 10, 'normal')).grid(row=5, column=3, sticky='nsew', padx=10)
+    huntButton = Button(huntWindow, text=f'{"Hunt (-$5)" if money >= 5 else "Go get a job"}', width=15, command=huntPet,
+                        state=f'{"disable" if money < 5 else "normal"}')
     huntButton.grid(row=7, column=3, pady=(10, 15))
 
     huntWindow.protocol("WM_DELETE_WINDOW", lambda: huntingCallbackProtocol(huntWindow))
