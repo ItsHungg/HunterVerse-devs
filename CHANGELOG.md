@@ -9,7 +9,7 @@ All changes to this project will be documented in this file!
 ### Added
  - Added hunting system
  - Added Buying feature (not being programmed, you can buy lootboxes here)
- - Added a $1000 (in game money) gift for new players.
+ - Added a $1000 (in game money) gift for new players
 ### Changed
  - Changed the padding system for the GUI
  - Used a different data file
