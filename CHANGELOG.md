@@ -1,3 +1,4 @@
+
 # Changelog
 All changes to this project will be documented in this file!
 
@@ -7,12 +8,17 @@ All changes to this project will be documented in this file!
 ## [0.9.3.x] - 04/19/2023
 ### Added
  - Added hunting system
- - Added Buying feature (you can buy lootboxes here)
+ - Added Buying feature (not being programmed, you can buy lootboxes here)
+ - Added a $1000 (in game money) gift for new players.
 ### Changed
  - Changed the padding system for the GUI
+ - Used a different data file
+ - Updated an outdated fact
 ### Removed
  - Removed the Daily feature (earn daily money)
  - Removed 1 fact
+ ### Fixed
+ - Fixed a few grammar mistakes
 ## [[0.9.2.x]](https://sites.google.com/view/project-hunterverse/versions?authuser=0#h.6aucpw48oqvp) - 04/14/2023
 ### Added
  - Added `padx` and `pady` for Registration GUI window
@@ -36,6 +42,6 @@ All changes to this project will be documented in this file!
 ### Added
  - Added Register system
 ### Fixed
- - Fixed the background running after closing the Registration window (major bug)
+ - Fixed the background running after closing the Registration window
 
 <hr>
