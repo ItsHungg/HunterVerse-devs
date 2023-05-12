@@ -1,12 +1,13 @@
 from tkinter import messagebox
 from tkinter import ttk
 from tkinter import *
+import keyboard
 import platform
 import random
 import time
 
 project_name = 'HunterVerse'
-version = '0.9.3.5'
+version = '0.9.3.7'
 version_code = sum(list(map(int, version.split('.'))))
 root = Tk()
 root.resizable(False, False)
@@ -17,6 +18,16 @@ with open('hunterverse\\assets\\user\\userdata.py', 'r') as userget:
     if userget.read().strip() != '':
         register_need = False
     else:
+        with open('hunterverse\\assets\\user\\userdata.py', 'w') as changeUnsaved:
+            changeUnsaved.write(
+                f'''# .%.%.%.%.
+pet = ''
+equipment = ''
+lootbox = ''
+
+closed = 'None'
+updated = '{time.strftime(f"%m-%d-%Y%%%T%%{int(time.time())}")}'
+''')
         register_need = True
 
 facts_tricks_string = f'''
@@ -51,6 +62,22 @@ def temp():
     pass
 
 
+def savedata(closed: bool = False):
+    with open('hunterverse\\assets\\user\\userdata.py', 'r') as saveData:
+        linesRead = saveData.readlines()
+        fileString: list = linesRead[0].replace('#', '').strip().split('%')
+    fileString[4] = str(money)
+    with open('hunterverse\\assets\\user\\userdata.py', 'w') as saveRegister:
+        saveRegister.write(f'''# {"%".join(fileString)}
+pet = '{".".join(petListAlt)}'
+equipment = '{".".join(equipmentListAlt)}'
+lootbox = '{".".join(lootboxListAlt)}'
+
+closed = '{time.strftime(f"%m-%d-%Y%%%T%%{int(time.time())}") if closed else linesRead[5][:-1].replace("closed = ", "").replace("'", "")}'
+updated = '{time.strftime(f"%m-%d-%Y%%%T%%{int(time.time())}")}'
+''')
+
+
 def register():
     registerPage = Toplevel(root)
     registerPage.title('Registration')
@@ -80,7 +107,14 @@ def register():
         usernameEntry.configure(state=DISABLED)
         with open('hunterverse\\assets\\user\\userdata.py', 'w') as saveRegister:
             saveRegister.write(
-                f'# {usernameEntry.get()}%{time.strftime("%m-%d-%Y")}%{time.strftime("%T")}%{int(time.time())}%1000\n')
+                f'''# {usernameEntry.get()}%{time.strftime("%m-%d-%Y")}%{time.strftime("%T")}%{int(time.time())}%1000
+pet = ''
+equipment = ''
+lootbox = '{".".join(["Basic Lootbox" for _ in range(3)])}'
+
+closed = 'None'
+updated = '{time.strftime(f"%m-%d-%Y%%%T%%{int(time.time())}")}'
+''')
 
         Label(registerPage, text='Processing...', font=('Calibri', 11, 'bold')).grid(row=10, column=3, columnspan=3,
                                                                                      pady=5)
@@ -88,6 +122,7 @@ def register():
 
     def quitRegister():
         if messagebox.askyesno('Quit Registration', 'Are you sure to cancel the registration progress?'):
+            open('hunterverse\\assets\\user\\userdata.py', 'w').close()
             root.destroy()
 
     mainregisterFrame = Frame(registerPage)
@@ -120,7 +155,7 @@ def loadingProcess():
     mainProgressWindow.resizable(False, False)
 
     with open('hunterverse\\assets\\user\\userdata.py', 'r') as setUser:
-        userString = setUser.read().replace('#', '').strip().split('%')
+        userString = setUser.readlines()[0].replace('#', '').strip().split('%')
         username = userString[0]
         money = int(userString[4])
 
@@ -136,6 +171,13 @@ def loadingProcess():
             if register_need and isMainStarted:
                 root.after(250, lambda: messagebox.showinfo('Claim Confirmed',
                                                             f'You have claimed ${money} as a STARTER GIFT!'))
+            keyboard.add_hotkey('ctrl+shift+a+1', pet)
+            keyboard.add_hotkey('ctrl+shift+a+2', equipment)
+            keyboard.add_hotkey('ctrl+shift+a+3', lootbox)
+            keyboard.add_hotkey('ctrl+shift+a+4', coinflip)
+            keyboard.add_hotkey('ctrl+shift+b+1', hunt)
+            root.attributes("-topmost", True)
+            root.attributes("-topmost", False)
 
         if mainProgressbar['value'] < 100:
             if mainProgressbar['value'] == 24:
@@ -146,7 +188,7 @@ def loadingProcess():
                 factsLabel.configure(text=f'Facts: {facts_trick[3]}')
             mainProgressbar['value'] += 1
             mainProgressValueLabel.configure(text=f'Initializing... ({int(mainProgressbar["value"])}%)')
-            repeatMainProgress = root.after(random.randint(10, 500), startInit)
+            repeatMainProgress = root.after(random.randint(5, 450), startInit)
         else:
             mainProgressValueLabel.configure(text=f'Successfully run: {project_name} {version}')
             factsLabel.configure(text=f'Thanks for playing {project_name}. Now, enjoy your game!', foreground='#350c4f')
@@ -171,6 +213,7 @@ def loadingProcess():
             mainProgressbar['value'] = 100
             mainProgressValueLabel.configure(text='Terminating initialization...')
             root.after(random.randint(1500, 3000), lambda: root.destroy())
+            savedata()
             del repeatMainProgress
 
     mainProgressWindow.protocol("WM_DELETE_WINDOW", temp)
@@ -224,6 +267,8 @@ def keyforPetsPropertiesFilter(x: str):
 
 
 def keyforPetsFilter(x: str):
+    if x == '':
+        return 0
     return int(average(int("".join([k[1][0] for k in petsProperties if x in k])),
                        int("".join([k[1][1] for k in petsProperties if x in k]))))
 
@@ -240,8 +285,11 @@ def keyforLootboxFilter(x: str):
 
 
 # # Values DECLARATION
-isCoinFlipOpened = False
+isPetOpened = False
+isEquipmentOpened = False
 isLootboxOpened = False
+isCoinFlipOpened = False
+isBuyOpened = False
 isHuntingOpened = False
 
 # # Pets DECLARATION
@@ -267,7 +315,9 @@ Buffalo.80:76
 petsProperties = sorted(
     [[i.split('.')[0], i.split('.')[1].split(':')] for i in petsPropertiesString.split('\n') if i != ''],
     key=keyforPetsPropertiesFilter, reverse=True)
-petListAlt = []
+with open('hunterverse\\assets\\user\\userdata.py', 'r') as getPetList:
+    petLine = getPetList.readlines()[1].replace('pet = ', '').replace('\'', '').strip().split('.')
+petListAlt = petLine if petLine[0] != '' else []
 petList = sorted(list(set(petListAlt.copy())), key=keyforPetsFilter, reverse=True)
 # petList = sorted([x[0] for x in petsProperties], key=keyforPetsFilter, reverse=True)
 
@@ -292,7 +342,9 @@ Strength Poison 3.25
 '''
 
 equipmentProperties = [[i.split('.')[0], i.split('.')[1]] for i in equipmentPropertiesString.split('\n') if i != '']
-equipmentListAlt = []
+with open('hunterverse\\assets\\user\\userdata.py', 'r') as getEquipmentList:
+    equipmentLine = getEquipmentList.readlines()[2].replace('equipment = ', '').replace('\'', '').strip().split('.')
+equipmentListAlt = equipmentLine if equipmentLine[0] != '' else []
 equipmentList = sorted(list(set(equipmentListAlt.copy())), key=keyforWeaponsFilter, reverse=True)
 
 # # Lootbox DECLARATION
@@ -304,12 +356,28 @@ Iron Lootbox.Knife:Bow:Crossbow:Spear:Sword:Hammer:Strength Poison 1
 Golden Lootbox.Bow:Crossbow:Spear:Sword:Hammer:Axe:Boots
 Diamond Lootbox.Bow:Spear:Sword:Hammer:Axe:Boots:Leggings:Strength Poison 2
 Emerald Lootbox.Sword:Hammer:Axe:Boots:Leggings:Armor:Helmet:Strength Poison 3
-{"Asian Lootbox.Slippers" if time.strftime("%d/%m") == "01/04" else "Special Lootbox.Axe:Boots:Leggings:Armor:Helmet:Strength Poison 1:Strength Poison 2:Strength Poison 3"}
+Special Lootbox.Axe:Boots:Leggings:Armor:Helmet:Strength Poison 1:Strength Poison 2:Strength Poison 3
+{"Asian Lootbox.Slippers" if time.strftime("%d/%m") == "01/04" else ""}
 '''
 lootboxProperties = [[i.split('.')[0], i.split('.')[1].split(':')] for i in lootboxPropertiesString.split('\n') if
                      i != '']
-lootboxListAlt = [n[0] for n in random.choices(lootboxProperties, k=15)]
+with open('hunterverse\\assets\\user\\userdata.py', 'r') as getLootboxList:
+    lootboxLine = ['Basic Lootbox', 'Basic Lootbox', 'Basic Lootbox'] if register_need else getLootboxList.readlines()[
+        3].replace('lootbox = ', '').replace('\'', '').strip().split('.')
+lootboxListAlt = lootboxLine if lootboxLine[0] != '' else []
 lootboxList = sorted(list(set(lootboxListAlt.copy())), key=keyforLootboxFilter)
+
+lootboxPrices = {
+    'Basic Lootbox': 100,
+    'Silver Lootbox': 500,
+    'Copper Lootbox': 750,
+    'Iron Lootbox': 1000,
+    'Golden Lootbox': 1500,
+    'Diamond Lootbox': 2000,
+    'Emerald Lootbox': 3000,
+    'Special Lootbox': 5000,
+    'Asian Lootbox': 10000
+}
 
 # HEADER FRAME
 headerFrame = Frame(root)
@@ -326,7 +394,15 @@ menuFrame.grid(row=5, column=3, padx=5, pady=5)
 
 
 def pet():
-    global petList
+    global petList, isPetOpened
+    if isPetOpened:
+        return
+    isPetOpened = True
+
+    def petCallbackProtocol(master):
+        global isPetOpened
+        isPetOpened = False
+        master.destroy()
 
     def petSelect(_):
         selected_indices = petListbox.curselection()[0]
@@ -359,14 +435,24 @@ def pet():
     petInfoLabel = Label(mainpetFrame, text='Attack\t: ...\nDefense\t: ...\nTotal\t: ...')
     petInfoLabel.grid(row=7, column=5, sticky='n')
 
-    Button(mainpetFrame, text='Close', command=lambda: petWindow.destroy(), background='red', ).grid(row=70, column=5,
-                                                                                                     sticky='ew',
-                                                                                                     padx=10)
+    Button(mainpetFrame, text='Close', command=lambda: petCallbackProtocol(petWindow), background='red').grid(
+        row=70, column=5,
+        sticky='ew',
+        padx=10)
     petListbox.bind('<<ListboxSelect>>', petSelect)
+    petWindow.protocol("WM_DELETE_WINDOW", lambda: petCallbackProtocol(petWindow))
 
 
 def equipment():
-    global equipmentList
+    global equipmentList, isEquipmentOpened
+    if isEquipmentOpened:
+        return
+    isEquipmentOpened = True
+
+    def equipmentCallbackProtocol(master):
+        global isEquipmentOpened
+        isEquipmentOpened = False
+        master.destroy()
 
     def equipmentSelect(_):
         selected_indices = equipmentListbox.curselection()[0]
@@ -401,11 +487,13 @@ def equipment():
     equipmentInfoLabel = Label(mainequipmentFrame, text='Total: +...%')
     equipmentInfoLabel.grid(row=7, column=5, sticky='n')
 
-    Button(mainequipmentFrame, text='Close', command=lambda: equipmentWindow.destroy(), background='red', ).grid(row=70,
-                                                                                                                 column=5,
-                                                                                                                 sticky='ew',
-                                                                                                                 padx=10)
+    Button(mainequipmentFrame, text='Close', command=lambda: equipmentCallbackProtocol(equipmentWindow),
+           background='red').grid(row=70,
+                                  column=5,
+                                  sticky='ew',
+                                  padx=10)
     equipmentListbox.bind('<<ListboxSelect>>', equipmentSelect)
+    equipmentWindow.protocol("WM_DELETE_WINDOW", lambda: equipmentCallbackProtocol(equipmentWindow))
 
 
 def lootbox():
@@ -452,6 +540,7 @@ def lootbox():
                     showResultLabel2.grid(row=4, column=3)
 
                     isLootboxOpened = False
+                    savedata()
                     root.after(5000, lambda: showOpenResultWindow.destroy())
 
                 if openProgressBar['value'] < 100:
@@ -518,10 +607,10 @@ def lootbox():
     lootboxOpenButton.grid(row=7, column=5, sticky='n')
 
     Button(mainlootboxFrame, text='Close', command=lambda: lootboxCallbackProtocol(lootboxWindow),
-           background='red', ).grid(row=70,
-                                    column=5,
-                                    sticky='ew',
-                                    padx=10)
+           background='red').grid(row=70,
+                                  column=5,
+                                  sticky='ew',
+                                  padx=10)
     lootboxListbox.bind('<<ListboxSelect>>', lootboxSelect)
     lootboxWindow.protocol("WM_DELETE_WINDOW", lambda: lootboxCallbackProtocol(lootboxWindow))
 
@@ -589,6 +678,7 @@ def coinflip():
                 if result == faceChosen:
                     money += betValue * 2
                 isCoinFlipOpened = False
+                savedata()
                 root.after(10000, lambda: flipWindow.destroy())
 
             betValue = int(moneyValue.replace('$', ''))
@@ -636,6 +726,151 @@ def coinflip():
     coinflipWindow.protocol("WM_DELETE_WINDOW", lambda: cfCallbackProtocol(coinflipWindow))
 
 
+def buy():
+    global isBuyOpened
+    if isBuyOpened:
+        return
+    isBuyOpened = True
+
+    def buyCallbackProtocol(master):
+        global isBuyOpened
+        isBuyOpened = False
+        master.destroy()
+
+    def buySelect(_):
+        selected_indices = buyListbox.curselection()[0]
+        selected_item = buyList[selected_indices]
+
+        buyNameLabel.configure(text=f'{selected_item}')
+        costLabel.configure(text=f'Cost: ${lootboxPrices[selected_item]}')
+        lootboxPropertiesButton.configure(state=NORMAL)
+        buyLootboxButton.configure(state=NORMAL)
+
+    def buyLootboxProperties():
+
+        def viewBuyLootboxPropertiesSelect(_):
+            equipment_selected_indices = viewBuyLootboxPropertiesListbox.curselection()[0]
+            equipment_selected_item = equipmentBuyList[equipment_selected_indices]
+
+            viewBuyLootboxPropertiesNameLabel.configure(
+                text=f'{equipment_selected_item}')
+            viewBuyLootboxPropertiesInfoLabel.configure(
+                text=f'Total: +{[k[1] for k in equipmentProperties if equipment_selected_item in k][0]}%')
+
+        viewBuyLootboxPropertiesWindow = Toplevel(root)
+        viewBuyLootboxPropertiesWindow.title('Properties')
+        viewBuyLootboxPropertiesWindow.resizable(False, False)
+
+        mainviewBuyLootboxPropertiesFrame = Frame(viewBuyLootboxPropertiesWindow)
+        mainviewBuyLootboxPropertiesFrame.grid(row=3, column=3, padx=5, pady=5)
+
+        Label(mainviewBuyLootboxPropertiesFrame, text=f'{buyList[buyListbox.curselection()[0]]} Properties:',
+              font=('Calibri', 18, 'bold')).grid(row=3, column=3,
+                                                 columnspan=3,
+                                                 pady=5)
+        equipmentBuyList = sorted([k[1] for k in lootboxProperties if buyList[buyListbox.curselection()[0]] in k][0],
+                                  key=keyforWeaponsFilter)
+        viewBuyLootboxPropertiesListbox = Listbox(mainviewBuyLootboxPropertiesFrame,
+                                                  listvariable=Variable(value=equipmentBuyList), border=1,
+                                                  selectmode=BROWSE,
+                                                  font=('Calibri', 11, 'normal'))
+        viewBuyLootboxPropertiesListbox.grid(row=5, column=3, rowspan=75, sticky='nsew')
+
+        viewBuyLootboxPropertieslistScrollbar = ttk.Scrollbar(mainviewBuyLootboxPropertiesFrame, orient=VERTICAL,
+                                                              command=viewBuyLootboxPropertiesListbox.yview)
+        viewBuyLootboxPropertieslistScrollbar.grid(row=5, column=4, rowspan=75, sticky='wns')
+        viewBuyLootboxPropertiesListbox.configure(yscrollcommand=viewBuyLootboxPropertieslistScrollbar.set)
+
+        viewBuyLootboxPropertiesNameLabel = Label(mainviewBuyLootboxPropertiesFrame, text='N/A',
+                                                  font=('Calibri', 11, 'bold'))
+        viewBuyLootboxPropertiesNameLabel.grid(row=5, column=5, sticky='n')
+        viewBuyLootboxPropertiesInfoLabel = Label(mainviewBuyLootboxPropertiesFrame, text='Total: +...%')
+        viewBuyLootboxPropertiesInfoLabel.grid(row=7, column=5, sticky='n')
+
+        Button(mainviewBuyLootboxPropertiesFrame, text='Close',
+               command=lambda: viewBuyLootboxPropertiesWindow.destroy(),
+               background='red').grid(row=70,
+                                      column=5,
+                                      sticky='ew',
+                                      padx=10)
+        viewBuyLootboxPropertiesListbox.bind('<<ListboxSelect>>', viewBuyLootboxPropertiesSelect)
+        root.after(30000, lambda: viewBuyLootboxPropertiesWindow.destroy())
+
+    def buyLootbox():
+        lootboxName = buyList[buyListbox.curselection()[0]]
+
+        buyLootboxWindow = Toplevel()
+        buyLootboxWindow.title(f'Purchase {lootboxName} (1)')
+        buyLootboxWindow.resizable(False, False)
+
+        def amountValidator(item):
+            if item == '' or item.isdigit() and 0 < int(item) < 100:
+                return True
+            else:
+                return False
+
+        def checkValue(event):
+            buyLootboxWindow.focus()
+            item = amountGet.get().strip()
+            print('Ok?', item)
+            if item == '':
+                amountGet.insert(0, '1')
+            elif item.isdigit() and int(item) > 1:
+                buyLootboxWindow.title(f'Purchase {lootboxName}es ({item})')
+            else:
+                buyLootboxWindow.title(f'Purchase {lootboxName} (1)')
+
+            if event:
+                amountGet.focus()
+
+        amountValidReg = buyLootboxWindow.register(amountValidator)
+
+        Label(buyLootboxWindow, text=f'Lootbox Purchase ', font=('Calibri', 28, 'bold')).grid(row=3, column=3, padx=10)
+        Label(buyLootboxWindow, text=f'({lootboxName})', font=('Calibri', 15, 'bold')).grid(row=4, column=3)
+        amountGet = ttk.Spinbox(buyLootboxWindow, from_=1, to=99, command=lambda: checkValue(0), width=4,
+                                validate='key',
+                                validatecommand=(amountValidReg,
+                                                 '%P'))  # validate='key', validatecommand=(amountValidReg, '%P'), command=checkValue)
+        amountGet.set(1)
+        amountGet.grid(row=5, column=3)
+
+        amountGet.bind('<KeyRelease>', checkValue)
+
+    buyWindow = Toplevel(root)
+    buyWindow.title('Buy')
+    buyWindow.resizable(False, False)
+
+    mainbuyFrame = Frame(buyWindow)
+    mainbuyFrame.grid(row=3, column=3, padx=5, pady=5)
+
+    Label(mainbuyFrame, text=f'Buy Lootboxes', font=('Calibri', 18, 'bold')).grid(row=3, column=3, columnspan=3, pady=5)
+    buyList = [k[0] for k in lootboxProperties]
+    buyListbox = Listbox(mainbuyFrame, listvariable=Variable(value=buyList), border=1, selectmode=BROWSE,
+                         font=('Calibri', 11, 'normal'))
+    buyListbox.grid(row=5, column=3, rowspan=75, sticky='nsew')
+
+    buylistScrollbar = ttk.Scrollbar(mainbuyFrame, orient=VERTICAL, command=buyListbox.yview)
+    buylistScrollbar.grid(row=5, column=4, rowspan=75, sticky='wns')
+    buyListbox.configure(yscrollcommand=buylistScrollbar.set)
+
+    buyNameLabel = Label(mainbuyFrame, text=f'N/A', font=('Calibri', 11, 'bold'))
+    buyNameLabel.grid(row=5, column=5, sticky='n')
+    costLabel = Label(mainbuyFrame, text=f'Cost: $0')
+    costLabel.grid(row=7, column=5, sticky='n')
+    lootboxPropertiesButton = Button(mainbuyFrame, text='Properties', state=DISABLED, width=9,
+                                     command=buyLootboxProperties)
+    lootboxPropertiesButton.grid(row=9, column=5, pady=(3, 0))
+    buyLootboxButton = Button(mainbuyFrame, text='Buy', state=DISABLED, width=9, command=buyLootbox)
+    buyLootboxButton.grid(row=11, column=5)
+
+    Button(mainbuyFrame, text='Close', command=lambda: buyCallbackProtocol(buyWindow), background='red').grid(
+        row=70, column=5,
+        sticky='ew',
+        padx=10)
+    buyListbox.bind('<<ListboxSelect>>', buySelect)
+    buyWindow.protocol("WM_DELETE_WINDOW", lambda: buyCallbackProtocol(buyWindow))
+
+
 def hunt():
     global isHuntingOpened, money
     if isHuntingOpened or isCoinFlipOpened:
@@ -679,6 +914,7 @@ def hunt():
             showResultLabel2.grid(row=4, column=3)
 
             isHuntingOpened = False
+            savedata()
             root.after(5000, lambda: huntResultWindow.destroy())
 
         def huntingProgress():
@@ -766,7 +1002,7 @@ cashButton = Button(economyFrame, text='Currency', width=10)
 cashButton.grid(row=4, column=3, padx=14)
 
 # # # Buy
-dailyButton = Button(economyFrame, text='Buy', width=10)
+dailyButton = Button(economyFrame, text='Buy', width=10, command=buy)
 dailyButton.grid(row=4, column=4, padx=14)
 
 # # ACTION
@@ -797,13 +1033,13 @@ userFrame.grid(row=12, column=3)
 userText = Label(userFrame, text='User', font=('Calibri', 16, 'bold'), foreground='#440f63')
 userText.grid(row=3, column=2, pady=5, columnspan=2)
 
-# # # Statistics
-statButton = Button(userFrame, text='Statistics', width=10)
-statButton.grid(row=4, column=2, padx=14)
-
 # # # Profile
 profileButton = Button(userFrame, text='Profile', width=10)
-profileButton.grid(row=4, column=3, padx=14)
+profileButton.grid(row=4, column=2, padx=14)
+
+# # # Profile
+settingButton = Button(userFrame, text='Setting', width=10)
+settingButton.grid(row=4, column=3, padx=14)
 
 Label(root, font=('Verdana', 2, 'normal')).grid(row=99, columnspan=100)
 ttk.Separator(root, orient='horizontal').grid(row=100, columnspan=100, sticky='ew')
@@ -814,6 +1050,7 @@ Label(root, text=f'{project_name}', font=('Verdana', 10, 'bold'), foreground='#0
 def askExit():
     if messagebox.askyesno(f'{project_name} {version}', f'Are you sure to quit {project_name} {version} ?',
                            icon='warning'):
+        savedata(True)
         root.destroy()
 
 
